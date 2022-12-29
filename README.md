@@ -25,3 +25,4 @@
 - [Material Icons](https://cdn.discordapp.com/attachments/1057831739826917399/1057831893728505896/MaterialCore.rbxmx)
 - [RigEdit Plus](https://cdn.discordapp.com/attachments/1057831739826917399/1057831894038872084/RigEditPlus.rbxmx)
 - [UiTools](https://cdn.discordapp.com/attachments/1057831739826917399/1057831894294728755/UI_Tools.rbxmx)
+- [Moon Animator 2](https://cdn.discordapp.com/attachments/1057831739826917399/1057833832172232745/Moon_Animator_2.rbxmx)
