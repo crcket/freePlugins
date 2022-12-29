@@ -1,3 +1,11 @@
+# TO INSTALL:
+1. Open Roblox Studio
+2. Create a new game or open an existing one
+3. On the top, press the "Plugins" tab
+4. Press on "Plugins Folder"
+5. Drag the .rbxmx file into this folder (Some extensions will need Roblox Studio to be restarted)
+
+
 # Virustotal links for all plugins listed here.
 - [Autocode Virustotal](https://www.virustotal.com/gui/file/0875f05e905e8470e189e83c2208a19a7a0a3d45dbc9a88bcf63bd3e37f48cb8)
 - [Autoscale Plus Virustotal](https://www.virustotal.com/gui/file/7c70774c65fc5a0eaa16f5af24a9f5582a1c8f787a3b30e6e6817ced84c20449)
