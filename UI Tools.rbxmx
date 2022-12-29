@@ -1,0 +1,6534 @@
+<roblox xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.roblox.com/roblox.xsd" version="4">
+	<External>null</External>
+	<External>nil</External>
+	<Item class="Model" referent="RBX1BED030A71744A9FBCECBB45A5A7BA46">
+		<Properties>
+			<BinaryString name="AttributesSerialize"></BinaryString>
+			<token name="LevelOfDetail">0</token>
+			<CoordinateFrame name="ModelMeshCFrame">
+				<X>0</X>
+				<Y>0</Y>
+				<Z>0</Z>
+				<R00>1</R00>
+				<R01>0</R01>
+				<R02>0</R02>
+				<R10>0</R10>
+				<R11>1</R11>
+				<R12>0</R12>
+				<R20>0</R20>
+				<R21>0</R21>
+				<R22>1</R22>
+			</CoordinateFrame>
+			<SharedString name="ModelMeshData">yuZpQdnvvUBOTYh1jqZ2cA==</SharedString>
+			<Vector3 name="ModelMeshSize">
+				<X>0</X>
+				<Y>0</Y>
+				<Z>0</Z>
+			</Vector3>
+			<token name="ModelStreamingMode">0</token>
+			<string name="Name">UI Tools</string>
+			<bool name="NeedsPivotMigration">false</bool>
+			<Ref name="PrimaryPart">null</Ref>
+			<int64 name="SourceAssetId">-1</int64>
+			<BinaryString name="Tags"></BinaryString>
+			<OptionalCoordinateFrame name="WorldPivotData"></OptionalCoordinateFrame>
+		</Properties>
+		<Item class="Folder" referent="RBX335E89B84F204800ACFA4A94C81F7417">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">Data</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="ModuleScript" referent="RBXA5CDE710D1194248942CD97D4DD8CEEF">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Settings</string>
+					<string name="ScriptGuid">{5E209AE1-A45D-41A9-AE88-5A818D428672}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local Classes = main:getModule("Classes")
+local DataManager = main:getModule("DataManager")
+
+local MarketplaceService = game:GetService("MarketplaceService")
+local ServerStorage = game:GetService("ServerStorage")
+
+local State = Classes.State
+local data = DataManager.setData()
+
+local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
+local accentColors = {
+	Green = Color3.fromRGB(54, 218, 106),
+	Blue = Color3.fromRGB(43, 177, 255),
+	Purple = Color3.fromRGB(141, 65, 255),
+	Red = Color3.fromRGB(255, 87, 87),
+	Yellow = Color3.fromRGB(245, 200, 53),
+	LightPurple = Color3.fromRGB(189, 158, 255),
+	Orange = Color3.fromRGB(255, 168, 92)
+}
+
+local dynamicIcons = {
+	Green = "rbxassetid://9340649737",
+	Blue = "rbxassetid://9340650192",
+	Purple = "rbxassetid://9340648440",
+	Red = "rbxassetid://9340647972",
+	Yellow = "rbxassetid://9340647154",
+	LightPurple = "rbxassetid://9340649320",
+	Orange = "rbxassetid://9340648876"
+}
+
+local sortAs = {
+	"Red",
+	"Yellow",
+	"Orange",
+	"Blue",
+	"Green",
+	"LightPurple",
+	"Purple"
+}
+
+local lines = 0
+local allCode = ""
+
+local function get()
+	return pcall(function()
+		local info = MarketplaceService:GetProductInfo(6514761722, Enum.InfoType.Asset)
+		return info.Sales, info
+	end)
+end
+
+local success, sales = get()
+
+local function getLines()
+	lines = 0
+
+	for index, obj in ipairs(plugin:GetDescendants()) do
+		if obj:IsA("Script") or obj:IsA("ModuleScript") then
+			lines += (select(2, obj.Source:gsub("\n", "")) + 1)
+			allCode = allCode .. obj.Source
+		end
+	end
+end
+
+getLines()
+
+local hours, mins = os.date("*t")["hour"], os.date("*t")["min"]
+
+local cachedSettings = {
+	ActiveExtensions = {
+		"Select"
+	},
+
+	PluginVersion = "V. 1.4",
+	WidgetSettings = DockWidgetPluginGuiInfo.new(
+		Enum.InitialDockState.Left,
+		true,
+		false,
+		288,
+		409,
+		288,
+		409
+	),
+
+	Locked = State(true),
+
+	DefaultColor = State(Color3.fromRGB(45, 45, 45)),
+	ContainerBackgroundColor = State(Color3.fromRGB(33, 33, 33)),
+	ContainerTopColor = State(Color3.fromRGB(26, 26, 26)),
+	TextColor = State(Color3.fromRGB(255, 255, 255)),
+	TooltipColor = State(Color3.fromRGB(30, 30, 30)),
+
+	Accents = accentColors,
+	Accent = State(accentColors[data.Accent]),
+	AccentId = State(dynamicIcons[data.Accent]),
+
+	Bools = data.Bools,
+	Sets = data.Sets,
+	Gradients = data.Gradients,
+	Conversions = data.Conversions,
+	UDims = data.UDims,
+
+	SortAccentsAs = sortAs,
+
+	texts = {
+		"This is not a fake loading screen.",
+		"Hold on a second.",
+		success and ("A total of " .. sales  .. " sales.") or "Is your internet dead?",
+		"Don't you like these messages?",
+		"Keep up the good work!",
+		"First introduced on May 13th, 2021.",
+		"Don't forget about the smoothness!",
+		"It's " .. string.format("%s:%s", hours < 10 and "0" .. hours or hours, mins < 10 and "0" .. mins or mins) .. " for you, right?",
+		lines .. " lines of code.",
+		allCode:len() / 1000 .. " kB of code."
+	}
+}
+
+cachedSettings.Accent.__changed__(function()
+	task.spawn(function()
+		repeat task.wait() until dynamicIcons[DataManager.data.Accent] ~= cachedSettings.AccentId:get()
+		cachedSettings.AccentId:set(dynamicIcons[DataManager.data.Accent])
+	end)
+end, { Name = "dynamicaccents" })
+
+return function()
+	local data, loaded = DataManager.setData()
+
+	if loaded then
+		local h, min = os.date("*t")["hour"], os.date("*t")["min"]
+		local success, sales = get()
+
+		getLines()
+
+		-- update my stupid messages
+		cachedSettings.texts[5] = "It's " .. string.format("%s:%s", h < 10 and "0" .. h or h, min < 10 and "0" .. min or min) .. " for you, right?"
+		cachedSettings.texts[3] = success and ("A total of " .. sales  .. " sales.") or "Is your internet dead?"
+
+		cachedSettings.Accent:set(accentColors[data.Accent])
+		cachedSettings.AccentId:set(dynamicIcons[data.Accent])
+
+		cachedSettings.Bools = data.Bools
+		cachedSettings.Sets = data.Sets
+		cachedSettings.Gradients = data.Gradients
+		cachedSettings.Conversions = data.Conversions
+	end
+
+	return cachedSettings
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXAC76304F858B40D1BFB11E625F05FE76">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">ClassManager</string>
+					<string name="ScriptGuid">{AF7AC917-96F3-446B-945E-B6516EE067ED}</string>
+					<ProtectedString name="Source"><![CDATA[local HttpService = game:GetService("HttpService")
+local CollectionService = game:GetService("CollectionService")
+
+local failed = false
+
+local function getApi()
+	local success, res = pcall(function()
+		local ver = HttpService:GetAsync("https://setup.rbxcdn.com/versionQTStudio")
+		local json = HttpService:GetAsync(string.format("https://setup.rbxcdn.com/%s-API-Dump.json", ver))
+
+		return json
+	end)
+
+	if not success then
+		failed = true
+
+		if res:find("denied") then
+			warn("Please allow HTTP requests in Plugins > Manage Plugins > UI Tools. (restart required)")
+		else
+			warn("Failed to load Roblox API dump, class conversion will not be available.")
+		end
+
+		return "{}"
+	end
+
+	return res
+end
+
+local dump = getApi()
+local data = HttpService:JSONDecode(dump)
+
+local ignore = {
+	Hidden = true,
+	ReadOnly = true,
+	Deprecated = true
+}
+
+local cache = {
+	entries = {},
+	subclasses = {},
+	members = {}
+}
+
+local module = {}
+
+function module:getEntry(name)
+	if cache.entries[name] then return cache.entries[name] end
+
+	for _, entry in pairs(data.Classes) do
+		if entry.Name == name then
+			cache.entries[name] = entry
+			return entry
+		end
+	end
+end
+
+function module:getMembers(name)
+	if cache.members[name] then return cache.members[name] end
+
+	local members = {}
+	local entries = {}
+
+	local currentEntry = self:getEntry(name)
+
+	while currentEntry and currentEntry.Superclass ~= "<<<ROOT>>>" do
+		table.insert(entries, 1, currentEntry)
+		currentEntry = self:getEntry(currentEntry.Superclass)
+	end
+
+	if currentEntry == nil then
+		error(string.format("Class name %s could not be found", name))
+	end
+
+	table.insert(entries, 1, currentEntry)
+
+	for i, v in ipairs(entries) do
+		for _, member in ipairs(v.Members) do
+			members[#members + 1] = member
+		end
+	end
+
+	cache.members[name] = members
+	return members
+end
+
+function module:getProperties(name)
+	local members = self:getMembers(name)
+	local props = {}
+
+	for _, member in ipairs(members) do
+		if member.MemberType == "Property" then
+			local convertable = true
+
+			if member.Tags then
+				for _, tag in pairs(member.Tags) do
+					if ignore[tag] then
+						convertable = false
+						break
+					end
+				end
+			end
+
+			if convertable then
+				props[#props + 1] = member.Name
+			end
+		end
+	end
+
+	return props
+end
+
+function module.convert(from, to)
+	if failed then return end
+
+	if not module:getEntry(to) then return warn("Class " .. to .. " does not exist.") end
+	local toInst
+
+	local success = pcall(function()
+		local p = Instance.new(from.ClassName)
+		p:Destroy()
+
+		toInst = Instance.new(to)
+	end)
+
+	if success then
+		local children = {}
+
+		for _, child in ipairs(from:GetChildren()) do
+			table.insert(children, child:Clone())
+			child:Remove()
+		end
+
+		local fromProps = module:getProperties(from.ClassName)
+		local toProps = module:getProperties(to)
+
+		for _, prop in ipairs(fromProps) do
+			if table.find(toProps, prop) and prop ~= "Parent" then
+				pcall(function()
+					toInst[prop] = from[prop]
+				end)
+			end
+		end
+
+		for name, value in pairs(from:GetAttributes()) do
+			toInst:SetAttribute(name, value)
+		end
+
+		for _, tag in pairs(CollectionService:GetTags(from)) do
+			CollectionService:AddTag(toInst, tag)
+		end
+
+		for _, child in ipairs(children) do
+			child.Parent = toInst
+		end
+
+		toInst.Parent = from.Parent
+		from:Remove()
+
+		table.clear(children)
+		return toInst
+	end
+end
+
+return module]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX5D4A43A447454A95AF3267DC8BB07E42">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">DataManager</string>
+					<string name="ScriptGuid">{C7CD120A-3AE0-44A1-B172-935D3B371554}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local HttpService = game:GetService("HttpService")
+local GameData = game:GetService("DataStoreService")
+local Studio = game:GetService("StudioService")
+
+local classes = main:getModule("Classes")
+
+local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+local State = classes.State
+
+local defaultData = {
+	Accent = "Red",
+
+	Bools = {
+		["Check For Updates"] = true,
+		["Per-Game Data Saving"] = false
+	},
+
+	Sets = {},
+	Gradients = {},
+	Conversions = {},
+	UDims = {}
+}
+
+local module = {}
+
+module.loaded = false
+module.data = nil
+
+-- private functions
+local function decode(str)
+	return HttpService:JSONDecode(str)
+end
+
+local function checkForData(onlyCheck)
+	local id = Studio:GetUserId()
+	local success, data = pcall(decode, GameData:GetAttribute("UITools_" .. id))
+
+	if not success then
+		data = defaultData
+		module.data = defaultData
+
+		if not onlyCheck then
+			local default = defaultData
+			default.Bools["Per-Game Data Saving"] = true
+
+			GameData:SetAttribute("UITools_" .. id, HttpService:JSONEncode(default))
+		end
+	end
+
+	return data
+end
+
+local function isValid(data)
+	if typeof(data) == "string" then
+		data = HttpService:JSONDecode(data)
+	end
+
+	if typeof(data) ~= "table" then return false end
+
+	for name, value in pairs(defaultData) do
+		if not data[name] then
+			data[name] = value
+		end
+
+		if typeof(data[name]) ~= typeof(value) then
+			return false
+		end
+	end
+
+	for name, value in pairs(data) do
+		if not defaultData[name] then
+			data[name] = nil
+		end
+	end
+
+	for name, value in pairs(data.Bools) do
+		if not defaultData.Bools[name] then
+			data.Bools[name] = nil
+		end
+	end
+
+	return true
+end
+
+-- public functions
+function module.save()
+	local locally = plugin:GetSetting("SaveDataLocally") or false
+
+	if locally then
+		local id = Studio:GetUserId()
+		GameData:SetAttribute("UITools_" .. id, HttpService:JSONEncode(module.data))
+	else
+		plugin:SetSetting("UITools Saves", module.data)
+	end
+end
+
+function module.get()
+	local locally = plugin:GetSetting("SaveDataLocally") or false
+	local isValid = isValid(module.data)
+
+	if not isValid then
+		module.data = defaultData
+	end
+
+	if not locally then
+		return checkForData()
+	else
+		return plugin:GetSetting("UITools Saves")
+	end
+end
+
+function module.setData()
+	-- check if the settings file is corrupted
+	local success = pcall(function()
+		plugin:GetSetting("UITools Saves")
+	end)
+
+	if not success then
+		-- restart
+		warn("Why did you have to corrupt the settings file???")
+		_G.UIToolsThread.restart()
+	end
+
+	local loaded = false
+
+	if not module.loaded then
+		loaded = true
+		module.loaded = true
+
+		local gameData = checkForData(true)
+		local data = plugin:GetSetting("UITools Saves") or defaultData
+		local locally = plugin:GetSetting("SaveDataLocally") or false
+
+		-- force set data
+		if gameData.Bools then
+			gameData.Bools["Per-Game Data Saving"] = true
+		end
+
+		if data.Bools then
+			data.Bools["Per-Game Data Saving"] = false
+		end
+
+		if not locally then
+			module.data = data or defaultData
+		else
+			module.data = gameData
+		end
+
+		module.save()
+		local isValid = isValid(module.data)
+
+		if not isValid then
+			module.data = defaultData
+			module.save()
+		end
+
+		-- reconcile
+		for prop, value in pairs(defaultData.Bools) do
+			if module.data.Bools[prop] == nil then
+				module.data.Bools[prop] = value
+			end
+		end
+	end
+
+	return module.data, loaded
+end
+
+return module]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Folder" referent="RBXA57E1D9FABD1417C90E228ECCD7025B4">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">Core</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="ModuleScript" referent="RBX9AEAFD97FC6745DF995168E9F64F8FBC">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Plugin</string>
+					<string name="ScriptGuid">{72B391C2-4405-4A07-A765-FBEE0B73C56C}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+repeat task.wait() until main["getModule"]
+
+local config = main:getModule("Settings")()
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local dialog = main:getModule("InputDialog")
+local colorDialog = main:getModule("ColorDialog")
+local notify = main:getModule("Notify")
+local tooltip = main:getModule("Tooltip")
+
+local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
+local outBounce = TweenInfo.new(0.7, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
+local module = {}
+local methods = {}
+methods.__index = methods
+
+local gWidget
+
+local function Tween(instance, tweenInfo, goal)
+	local tween = TweenService:Create(instance, tweenInfo, goal)
+	tween:Play()
+end
+
+local function createContainerFunc(name, func, parent, buttons, cellSize)
+	local container = func(name, buttons, cellSize)
+	local mouse = plugin:GetMouse()
+
+	container.Parent = parent
+
+	repeat task.wait(0.1) until gWidget.Enabled
+	container.Size = UDim2.new(1, 0, 0, container.Main.UIGridLayout.AbsoluteContentSize.Y + 30)
+
+	local change = tooltip(container.Top.Hide, "Hide", methods._widget)
+
+	container.Top.Hide.MouseEnter:Connect(function()
+		if not config.Locked:get() then
+			mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+		end
+	end)
+
+	container.Top.Hide.MouseLeave:Connect(function()
+		if not config.Locked:get() then
+			mouse.Icon = "rbxasset://SystemCursors/Arrow"
+		end
+	end)
+
+	container.Top.Hide.MouseButton1Click:Connect(function()
+		if not config.Locked:get() then
+			if container.Main.Visible then
+				change("Show")
+
+				container.Main.Visible = false
+				container.Top.bottomCurve.Visible = false
+
+				container.Size = UDim2.new(1, 0, 0, 5)
+				container.Top.Hide.Image = "rbxassetid://8995578762"
+			else
+				change("Hide")
+
+				container.Main.Visible = true
+				container.Top.bottomCurve.Visible = true
+
+				container.Size = UDim2.new(1, 0, 0, container.Main.UIGridLayout.AbsoluteContentSize.Y + 30)
+				container.Top.Hide.Image = "rbxassetid://7956917807"
+			end
+		end
+	end)
+
+	return container
+end
+
+function methods:setupFirst(toolbar, button)
+	local widget = plugin:CreateDockWidgetPluginGui("UI Tools", config.WidgetSettings)
+	widget.Name = "UI Tools " .. config.PluginVersion
+	widget.Title = "UI Tools " .. config.PluginVersion
+	widget.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+	button.ClickableWhenViewportHidden = true
+	button:SetActive(widget.Enabled)
+	button.Enabled = not RunService:IsRunning()
+
+	if RunService:IsRunning() then
+		widget:Destroy()
+		plugin:Destroy()
+	end
+
+	button.Click:Connect(function()
+		widget.Enabled = not widget.Enabled
+		button:SetActive(widget.Enabled)
+	end)
+
+	widget:BindToClose(function()
+		button:SetActive(false)
+		widget.Enabled = not widget.Enabled
+	end)
+
+	return widget, RunService:IsRunning()
+end
+
+function methods:createPluginGui(toolbar, button)
+	local mainFrame = require(script.Main)()()
+
+	local createContainer = require(script.Container)()
+	local createPreferences = require(script.Preferences)()
+	local createColorSets = require(script.Colors)
+	local createConversionSets = require(script.Conversions)()
+	local createGradientSets = require(script.Gradients)()
+	local createConversionSets = require(script.Conversions)()
+	local createNavbar = require(script.Navbar)()
+
+	local widget, running = methods:setupFirst(toolbar, button)
+	local createButton = require(script.ContainerButtons)(widget)
+
+	methods._widget = widget
+	gWidget = widget
+	mainFrame.Parent = widget
+
+	if not running then
+		local preferences = createPreferences(config.Accents, config.Bools)
+		local navbar = createNavbar(mainFrame.Plugin.Pages)
+
+		navbar.Parent = mainFrame
+		preferences.Parent = mainFrame
+
+		createContainerFunc("Unit Conversion", createContainer, mainFrame.Plugin.Pages.Tools.ScrollingFrame.Container, {
+			createButton("Scale Size", "Converts size from offset to scale."),
+			createButton("Scale Position",  "Converts position from offset to scale."),
+
+			createButton("Offset Size", "Converts size from scale to offset."),
+			createButton("Offset Position", "Converts position from scale to offset.")
+		})
+
+		createContainerFunc("Positioning", createContainer, mainFrame.Plugin.Pages.Tools.ScrollingFrame.Container, {
+			createButton("Top Left", "Moves the selected object/s to the top left corner."),
+			createButton("Top", "Moves the selected object/s to the top."),
+			createButton("Top Right", "Moves the selected object/s to the top right corner."),
+
+			createButton("Left", "Moves the selected object/s to the left."),
+			createButton("Center", "Moves the selected object/s to the center."),
+			createButton("Right", "Moves the selected object/s to the right."),
+
+			createButton("Bottom Left", "Moves the selected object/s to the bottom left corner."),
+			createButton("Bottom", "Moves the selected object/s to the bottom."),
+			createButton("Bottom Right", "Moves the selected object/s to the bottom right corner."),
+		}, UDim2.new(0.333, -20, 0, 36))
+
+		createContainerFunc("Components", createContainer, mainFrame.Plugin.Pages.Tools.ScrollingFrame.Container, {
+			createButton("UIAspectRatio", "Adds a UIAspectRatio constraint with a pre-calculated value which locks the size ratio."),
+			createButton("UISize", "Adds a UISize constraint which clamps the size based on its max and min properties."),
+
+			createButton("UITextSize", "Adds a UITextSize constraint which clamps the text size based on its min and max properties."),
+			createButton("UIPadding", "Adds a UIPadding component which creates a padding effect."),
+
+			createButton("UIScale", "Adds a UIScale component which multiplies the size based on its scale property."),
+			createButton("UICorner", "Adds a UICorner component which creates a rounded border effect.")
+		})
+
+		createContainerFunc("Fast Tools", createContainer, mainFrame.Plugin.Pages.Tools.ScrollingFrame.Container, {
+			createButton("Fast Scale", "Quickly scales and adds a UIAspectRatio constraint inside selected object/s."),
+			createButton("Remove Borders", "Removes borders from selected object/s."),
+
+			createButton("Transparent Background", "Makes the background transparent for selected object/s."),
+			createButton("Fit Image", "Uses the 'fit' scale type for selected image/s."),
+
+			createButton("Custom Layout", "Removes the UIListLayout component from selected object/s and keeps the same effect which is compatible with dynamic size changes."),
+			createButton("Fit Parent", "Makes selected object/s fit their parent.")
+		})
+
+		local container = createContainerFunc("Colors", createContainer, mainFrame.Plugin.Pages.Presets.ScrollingFrame.Container, {}, UDim2.new(1, -20, 0, 36))
+		local container2 = createContainerFunc("Gradients", createContainer, mainFrame.Plugin.Pages.Presets.ScrollingFrame.Container, {}, UDim2.new(1, -20, 0, 36))
+		local container3 = createContainerFunc("Conversions", createContainer, mainFrame.Plugin.Pages.Presets.ScrollingFrame.Container, {}, UDim2.new(1, -20, 0, 36))
+
+		createColorSets(config.Sets, container.Main, widget)
+		createGradientSets(config.Gradients, container2.Main, widget)
+		createConversionSets(config.Conversions, container3.Main, widget)
+
+		dialog:createDialog(widget)
+		colorDialog:createDialog(widget)
+		notify:createDialog(widget)
+
+		local function update(scrollingFrame, list)
+			local connections = {}
+			local pos = 0
+
+			local function updateCanvasSize()
+				if connections[2] then
+					connections[2]:Disconnect()
+				end
+
+				scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, list.AbsoluteContentSize.Y + 15)
+
+				if scrollingFrame.Parent.ScrollBackground.AbsoluteSize.Y > list.AbsoluteContentSize.Y + 14 then
+					scrollingFrame.Parent.ScrollBackground.Visible = false
+
+					list.Parent.Size = UDim2.fromScale(1, 1)
+					list.Parent.Position = UDim2.fromScale(0.5, 0.5)
+				else
+					scrollingFrame.Parent.ScrollBackground.Visible = true
+
+					list.Parent.Size = UDim2.new(1, -15, 1, 0)
+					list.Parent.Position = UDim2.new(0.5, -6, 0.5, 0)
+				end
+
+				connections[2] = list:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(updateCanvasSize)
+			end
+
+			local function updateScrollBackground()
+				if connections[1] then
+					connections[1]:Disconnect()
+				end
+
+				if scrollingFrame.Parent.ScrollBackground.AbsoluteSize.Y > list.AbsoluteContentSize.Y + 14 then
+					scrollingFrame.Parent.ScrollBackground.Visible = false
+
+					list.Parent.Size = UDim2.fromScale(1, 1)
+					list.Parent.Position = UDim2.fromScale(0.5, 0.5)
+				else
+					scrollingFrame.Parent.ScrollBackground.Visible = true
+
+					list.Parent.Size = UDim2.new(1, -15, 1, 0)
+					list.Parent.Position = UDim2.new(0.5, -6, 0.5, 0)
+				end
+
+				connections[1] = widget:GetPropertyChangedSignal("AbsoluteSize"):Connect(updateScrollBackground)
+			end
+
+			updateCanvasSize()
+			updateScrollBackground()
+		end
+
+		update(mainFrame.Plugin.Pages.Tools.ScrollingFrame, mainFrame.Plugin.Pages.Tools.ScrollingFrame.Container.UIListLayout)
+		update(mainFrame.Plugin.Pages.Presets.ScrollingFrame, mainFrame.Plugin.Pages.Presets.ScrollingFrame.Container.UIListLayout)
+
+		methods.loaded = true
+	end
+end
+
+return methods]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBX98559C6533804325BA2133C2749E061D">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Container</string>
+						<string name="ScriptGuid">{98158D20-1E8A-4859-9D97-996210D63D0F}</string>
+						<ProtectedString name="Source"><![CDATA[return function()
+	local main = _G.UIToolsMain
+
+	local Classes = main:getModule("Classes")
+	local config = main:getModule("Settings")()
+
+	local New = Classes.New
+	local Children = Classes.Children
+	local Computed = Classes.Computed
+	local OnEvent = Classes.OnEvent
+
+	local function createGuiObjects(name, buttons, cellSize)
+		cellSize = cellSize or UDim2.new(0.5, -20, 0, 36)
+
+		return New "Frame" {
+			Name = name,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Size = UDim2.new(1, -5, 1, 0),
+			BackgroundTransparency = 1,
+
+			[Children] = {
+				New "Frame" {
+					Name = "Main",
+					AnchorPoint = Vector2.new(0.5, 0),
+
+					BackgroundColor3 = Computed(function()
+						return config.ContainerBackgroundColor
+					end),
+
+					BorderSizePixel = 0,
+					Position = UDim2.new(0.5, 0, 0, 15),
+					Size = UDim2.fromScale(1, 1),
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "UIGridLayout" {
+							CellPadding = UDim2.fromOffset(15, 15),
+							CellSize = cellSize,
+							HorizontalAlignment = Enum.HorizontalAlignment.Center,
+							VerticalAlignment = Enum.VerticalAlignment.Center,
+							SortOrder = Enum.SortOrder.LayoutOrder
+						},
+
+						New "UIPadding" {
+							PaddingTop = UDim.new(0, 4)
+						},
+
+						buttons
+					}
+				},
+
+				New "Frame" {
+					Name = "Top",
+
+					BackgroundColor3 = Computed(function()
+						return config.Accent
+					end),
+
+					Size = UDim2.new(1, 0, 0, 20),
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "Frame" {
+							Name = "bottomCurve",
+
+							BackgroundColor3 = Computed(function()
+								return config.Accent
+							end),
+
+							AnchorPoint = Vector2.new(0, 1),
+							Size = UDim2.new(1, 0, 0, 5),
+							Position = UDim2.fromScale(0, 1),
+							BorderSizePixel = 0
+						},
+
+						New "TextLabel" {
+							Name = "Title",
+
+							BackgroundTransparency = 1,
+							Position = UDim2.fromOffset(6, 0),
+							Size = UDim2.fromOffset(54, 21),
+							Font = Enum.Font.GothamSemibold,
+							TextXAlignment = Enum.TextXAlignment.Left,
+							Text = name,
+							TextColor3 = Color3.fromRGB(255, 255, 255),
+							TextSize = 14
+						},
+
+						New "ImageButton" {
+							Name = "Hide",
+							Active = false,
+							ImageColor3 = Color3.fromRGB(255, 255, 255),
+							BackgroundTransparency = 1,
+							Position = UDim2.new(1, -19, 0.2, 0),
+							Selectable = false,
+							Size = UDim2.fromOffset(11, 11),
+							ZIndex = 2,
+							Image = "rbxassetid://7956917807"
+						}
+					}
+				}
+			}
+		}
+	end
+
+	return createGuiObjects
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX59ECE47B91DC451E896F7D40B8190431">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Preferences</string>
+						<string name="ScriptGuid">{88B40F4F-7858-4CA8-B621-71AE19EA3AF8}</string>
+						<ProtectedString name="Source"><![CDATA[return function()
+	local main = _G.UIToolsMain
+
+	local Classes = main:getModule("Classes")
+	local config = main:getModule("Settings")()
+	local DataManager = main:getModule("DataManager")
+	local Plugin = main:getModule("Plugin")
+	local TweenService = game:GetService("TweenService")
+
+	local New = Classes.New
+	local Children = Classes.Children
+	local Computed = Classes.Computed
+	local OnEvent = Classes.OnEvent
+
+	local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+	local mouse = plugin:getMouse()
+
+	local outQuick = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+	local inQuick = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local function Tween(instance, tweenInfo, goal)
+		local tween = TweenService:Create(instance, tweenInfo, goal)
+		tween:Play()
+
+		return tween
+	end
+
+	local function createGuiObjects(unsortedAccents, bools)
+		local accents = {}
+
+		for index, accent in ipairs(config.SortAccentsAs) do
+			accents[index] = { unsortedAccents[accent], accent }
+		end
+
+		local accentsFrame = New "Frame" {
+			Name = "Accents",
+
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+			Size = UDim2.new(1, 0, 0, 28),
+			ZIndex = 6,
+
+			[Children] = {
+				New "UIListLayout" {
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 6)
+				}
+			}
+		}
+
+		local boolsFrame = New "Frame" {
+			Name = "Bools",
+
+			BackgroundTransparency = 1,
+			LayoutOrder = 4,
+			Size = UDim2.new(1, 0, 0, 300),
+			ZIndex = 7,
+
+			[Children] = {
+				New "UIListLayout" {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 6)
+				}
+			}
+		}
+
+		for _, data in pairs(accents) do
+			local color, name = unpack(data)
+
+			local button = New "TextButton" {
+				Parent = accentsFrame,
+				Name = name,
+				BackgroundColor3 = color,
+				Size = UDim2.fromOffset(28, 28),
+				AutoButtonColor = false,
+				Text = "",
+				ZIndex = 6,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "ImageLabel" {
+						Name = "Checkmark",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundTransparency = 1,
+						Position = UDim2.fromScale(0.5, 0.5),
+						Size = UDim2.fromScale(0.8, 0.8),
+						Image = "rbxassetid://7963475699",
+						ImageTransparency = 1,
+						ZIndex = 7
+					}
+				}
+			}
+
+			if color == config.Accent:get() then
+				button.Checkmark.ImageTransparency = 0
+			end
+
+			button.MouseButton1Click:Connect(function()
+				for index, accentButton in ipairs(accentsFrame:GetChildren()) do
+					if accentButton:IsA("TextButton") then
+						if accentButton.Name == name then
+							Tween(accentButton.Checkmark, outQuick, { ImageTransparency = 0 })
+						else
+							Tween(accentButton.Checkmark, outQuick, { ImageTransparency = 1 })
+						end
+
+						config.Accent:set(color)
+					end
+				end
+
+				DataManager.data.Accent = name
+				DataManager.save()
+
+				config.Accent:set(config.Accents[name])
+			end)
+
+			button.MouseEnter:Connect(function()
+				mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+			end)
+
+			button.MouseLeave:Connect(function()
+				mouse.Icon = "rbxasset://SystemCursors/Arrow"
+			end)
+		end
+
+		for name, value in pairs(bools) do
+			local frame = New "Frame" {
+				Name = name,
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				Size = UDim2.fromOffset(0, 18),
+				Parent = boolsFrame,
+				ZIndex = 6,
+
+				[Children] = {
+					New "UIListLayout" {
+						FillDirection = Enum.FillDirection.Horizontal,
+						SortOrder = Enum.SortOrder.LayoutOrder,
+						Padding = UDim.new(0, 6)
+					},
+
+					New "TextLabel" {
+						LayoutOrder = 1,
+						BackgroundTransparency = 1,
+						Size = UDim2.fromOffset(100, 18),
+						Font = Enum.Font.Gotham,
+						Text = name,
+						ZIndex = 6,
+
+						TextColor3 = Computed(function()
+							return config.TextColor
+						end),
+
+						TextSize = 14,
+						TextXAlignment = Enum.TextXAlignment.Left
+					}
+				}
+			}
+
+			local button = New "TextButton" {
+				Text = "",
+				Name = "bool",
+				Parent = frame,
+
+				BackgroundColor3 = Computed(function()
+					if config.Bools[name] then
+						return config.Accent
+					else
+						return config.ContainerBackgroundColor
+					end
+				end),
+
+				Size = UDim2.fromOffset(18, 18),
+				AutoButtonColor = false,
+				ZIndex = 6,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					}
+				}
+			}
+
+			button.MouseButton1Click:Connect(function()
+				if DataManager.data.Bools[name] then
+					Tween(button, outQuick, { BackgroundColor3 = config.ContainerBackgroundColor:get() })
+					DataManager.data.Bools[name] = false
+				else
+					Tween(button, outQuick, { BackgroundColor3 = config.Accent:get() })
+					DataManager.data.Bools[name] = true
+				end
+
+				DataManager.save()
+
+				if name == "Per-Game Data Saving" then
+					plugin:SetSetting("SaveDataLocally", DataManager.data.Bools[name])
+					Plugin._widget:Destroy()
+
+					-- re-run the plugin
+					_G.UIToolsThread.restart()
+				else
+					DataManager.save()
+				end
+			end)
+
+			button.MouseEnter:Connect(function()
+				mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+			end)
+
+			button.MouseLeave:Connect(function()
+				mouse.Icon = "rbxasset://SystemCursors/Arrow"
+			end)
+		end
+
+		local main = New "Frame" {
+			Name = "PreferencesFrame",
+
+			BackgroundColor3 = Computed(function()
+				return config.DefaultColor
+			end),
+
+			BorderSizePixel = 0,
+			Position = UDim2.new(0, 0, 1, 210),
+			AnchorPoint = Vector2.new(0, 1),
+			Size = UDim2.new(1, 0, 0, 210),
+			ZIndex = 6,
+		}
+
+		local done = New "TextButton" {
+			Parent = main,
+			Name = "Done",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			ZIndex = 6,
+
+			BackgroundColor3 = Computed(function()
+				return config.ContainerBackgroundColor
+			end),
+
+			BorderSizePixel = 0,
+			Position = UDim2.new(0.5, 0, 1, -28),
+			Size = UDim2.fromOffset(100, 30),
+			AutoButtonColor = false,
+			Font = Enum.Font.Gotham,
+			Text = "Done",
+
+			TextColor3 = Computed(function()
+				return config.TextColor
+			end),
+
+			TextSize = 13,
+			TextWrapped = true,
+
+			[OnEvent "MouseButton1Click"] = function()
+				Tween(Plugin._widget.Main.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+				Tween(main, inQuick, { Position = UDim2.new(0, 0, 1, 240) })
+				config.Locked:set(false)
+			end,
+
+			[Children] = {
+				New "UICorner" {
+					CornerRadius = UDim.new(0, 6)
+				}
+			}
+		}
+
+		done.MouseEnter:Connect(function()
+			mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+			Tween(done, outQuick, { BackgroundColor3 = config.Accent:get() })
+		end)
+
+		done.MouseLeave:Connect(function()
+			mouse.Icon = "rbxasset://SystemCursors/Arrow"
+			Tween(done, outQuick, { BackgroundColor3 = config.ContainerTopColor:get() })
+		end)
+
+		local container = New "Frame" {
+			Parent = main,
+			Name = "Container",
+			BorderSizePixel = 0,
+			BackgroundTransparency = 1,
+			Position = UDim2.new(0.5, 0, 0, 10),
+			AnchorPoint = Vector2.new(0.5, 0),
+			Size = UDim2.new(1, -20, 1, -45),
+			ZIndex = 7,
+
+			[Children] = {
+				New "UIListLayout" {
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 12)
+				},
+
+				New "TextLabel" {
+					BackgroundTransparency = 1,
+					Size = UDim2.fromOffset(100, 18),
+					Font = Enum.Font.GothamSemibold,
+					Text = "Accents",
+					ZIndex = 6,
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 18,
+					TextXAlignment = Enum.TextXAlignment.Left
+				},
+
+				New "TextLabel" {
+					BackgroundTransparency = 1,
+					Size = UDim2.fromOffset(100, 18),
+					Font = Enum.Font.GothamSemibold,
+					LayoutOrder = 2,
+					Text = "Main",
+					ZIndex = 6,
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 18,
+					TextXAlignment = Enum.TextXAlignment.Left
+				}
+			}
+		}
+
+		accentsFrame.Parent = container
+		boolsFrame.Parent = container
+
+		return main
+	end
+
+	return createGuiObjects
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBXCC2649D65E5E416DB718B854FF84AED1">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Main</string>
+						<string name="ScriptGuid">{670EBF1D-DC20-4E68-B836-07E6E5F4D301}</string>
+						<ProtectedString name="Source"><![CDATA[return function()
+	local main = _G.UIToolsMain
+
+	local Classes = main:getModule("Classes")
+	local config = main:getModule("Settings")()
+	local smoothen = main:getModule("SmoothScroll")
+
+	local TweenService = game:GetService("TweenService")
+
+	local New = Classes.New
+	local Children = Classes.Children
+	local Computed = Classes.Computed
+
+	local OnEvent = Classes.OnEvent
+
+	local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+	local mouse = plugin:getMouse()
+
+	local outQuick = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+	local outSemiQuick = TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local selected = config.texts[math.random(1, #config.texts)]
+
+	local function Tween(instance, tweenInfo, goal)
+		local tween = TweenService:Create(instance, tweenInfo, goal)
+		tween:Play()
+
+		return tween
+	end
+
+	local function createGuiObjects()
+		local main = New "Frame" {
+			Name = "Main",
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			Position = UDim2.new(0.5, 0, 0.5, 0),
+			Size = UDim2.fromScale(1, 1),
+
+			BackgroundTransparency = 1,
+
+			[Children] = {
+				New "Frame" {
+					Name = "Plugin",
+					BackgroundTransparency = 1,
+					BorderSizePixel = 0,
+					Position = UDim2.fromOffset(4, 44),
+					Size = UDim2.new(1, -9, 1, -84),
+
+					[Children] = {
+						New "Frame" {
+							Name = "Pages",
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Size = UDim2.fromScale(1, 1),
+
+							[Children] = {
+								New "UIPageLayout" {
+									Padding = UDim.new(0, 5),
+									SortOrder = Enum.SortOrder.LayoutOrder,
+									HorizontalAlignment = Enum.HorizontalAlignment.Center,
+									EasingStyle = Enum.EasingStyle.Quint,
+									TweenTime = 0.5,
+									GamepadInputEnabled = false,
+									ScrollWheelInputEnabled = false,
+									TouchInputEnabled = false,
+								},
+
+								New "Frame" {
+									Name = "Tools",
+									BackgroundTransparency = 1,
+									BorderSizePixel = 0,
+									Size = UDim2.fromScale(1, 1),
+
+									[Children] = {
+										New "ImageLabel" {
+											Name = "ScrollBackground",
+
+											BackgroundColor3 = Computed(function()
+												return config.ContainerBackgroundColor
+											end),
+
+											BorderSizePixel = 0,
+											Position = UDim2.new(1, -6, 0, 0),
+											Size = UDim2.new(0, 6, 1, 0),
+
+											[Children] = {
+												New "UICorner" {
+													CornerRadius = UDim.new(0.5, 0)
+												}
+											}
+										},
+
+										New "ScrollingFrame" {
+											BackgroundTransparency = 1,
+											BorderSizePixel = 0,
+											Size = UDim2.fromScale(1, 1),
+											BottomImage = "rbxassetid://7957105101",
+											CanvasSize = UDim2.fromScale(0, 1),
+											MidImage = "rbxassetid://7101162141",
+											ScrollBarThickness = 5,
+											ScrollingDirection = Enum.ScrollingDirection.Y,
+											TopImage = "rbxassetid://7957105897",
+											ZIndex = 2,
+
+											ScrollBarImageColor3 = Computed(function()
+												return config.TextColor
+											end),
+
+											[Children] = {
+												New "Frame" {
+													Name = "Container",
+													AnchorPoint = Vector2.new(0.5, 0.5),
+													BackgroundTransparency = 1,
+													BorderSizePixel = 0,
+													Position = UDim2.fromScale(0.5, 0.5),
+													Size = UDim2.fromScale(1, 1),
+
+													[Children] = {
+														New "UIListLayout" {
+															HorizontalAlignment = Enum.HorizontalAlignment.Center,
+															SortOrder = Enum.SortOrder.LayoutOrder,
+															Padding = UDim.new(0, 25)
+														}
+													}
+												}
+											}
+										}
+									}
+								},
+
+								New "Frame" {
+									Name = "Presets",
+									BackgroundTransparency = 1,
+									BorderSizePixel = 0,
+									Size = UDim2.fromScale(1, 1),
+
+									[Children] = {
+										New "ImageLabel" {
+											Name = "ScrollBackground",
+
+											BackgroundColor3 = Computed(function()
+												return config.ContainerBackgroundColor
+											end),
+
+											BorderSizePixel = 0,
+											Position = UDim2.new(1, -6, 0, 0),
+											Size = UDim2.new(0, 6, 1, 0),
+
+											[Children] = {
+												New "UICorner" {
+													CornerRadius = UDim.new(0.5, 0)
+												}
+											}
+										},
+
+										New "ScrollingFrame" {
+											BackgroundTransparency = 1,
+											BorderSizePixel = 0,
+											Size = UDim2.fromScale(1, 1),
+											BottomImage = "rbxassetid://7957105101",
+											CanvasSize = UDim2.fromScale(0, 1),
+											MidImage = "rbxassetid://7101162141",
+											ScrollBarThickness = 5,
+											ScrollingDirection = Enum.ScrollingDirection.Y,
+											TopImage = "rbxassetid://7957105897",
+											ZIndex = 2,
+
+											ScrollBarImageColor3 = Computed(function()
+												return config.TextColor
+											end),
+
+											[Children] = {
+												New "Frame" {
+													Name = "Container",
+													AnchorPoint = Vector2.new(0.5, 0.5),
+													BackgroundTransparency = 1,
+													BorderSizePixel = 0,
+													Position = UDim2.fromScale(0.5, 0.5),
+													Size = UDim2.fromScale(1, 1),
+
+													[Children] = {
+														New "UIListLayout" {
+															HorizontalAlignment = Enum.HorizontalAlignment.Center,
+															SortOrder = Enum.SortOrder.LayoutOrder,
+															Padding = UDim.new(0, 25)
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+
+				New "Frame" {
+					Name = "DarkFilter",
+					BackgroundColor3 = Color3.new(0, 0, 0),
+					BackgroundTransparency = 1,
+					Size = UDim2.fromScale(1, 1),
+					ZIndex = 5
+				},
+
+				New "Frame" {
+					Name = "Background",
+					AnchorPoint = Vector2.new(0.5, 0.5),
+
+					BackgroundColor3 = Computed(function()
+						return config.DefaultColor
+					end),
+
+					BorderColor3 = Color3.fromRGB(0, 0, 0),
+					BorderSizePixel = 0,
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = UDim2.fromScale(1, 1),
+					ZIndex = 0
+				},
+
+				New "Frame" {
+					Name = "TempBackground",
+					AnchorPoint = Vector2.new(0.5, 0.5),
+
+					BackgroundColor3 = Computed(function()
+						return config.DefaultColor
+					end),
+
+					BorderColor3 = Color3.fromRGB(0, 0, 0),
+					BorderSizePixel = 0,
+					Position = UDim2.fromScale(0.5, 0.5),
+					Size = UDim2.fromScale(1, 1),
+					ZIndex = 10,
+
+					[Children] = {
+						New "TextLabel" {
+							Name = "Title",
+							Font = Enum.Font.GothamSemibold,
+							Text = "The plugin is loading",
+
+							TextColor3 = Computed(function()
+								return config.TextColor
+							end),
+
+							TextSize = 18,
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Position = UDim2.new(0.5, 0, 0.5, 61),
+							Size = UDim2.fromOffset(200, 18),
+							ZIndex = 12
+						},
+
+						New "TextLabel" {
+							Name = "Undertitle",
+							Font = Enum.Font.GothamSemibold,
+							Text = selected,
+
+							TextColor3 = Computed(function()
+								return config.TextColor
+							end),
+
+							TextSize = 14,
+							AnchorPoint = Vector2.new(0.5, 0.5),
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Position = UDim2.new(0.5, 0, 0.5, 84),
+							Size = UDim2.fromOffset(200, 14),
+							ZIndex = 12
+						},
+
+						New "ImageLabel" {
+							Image = "rbxassetid://8998065601",
+							AnchorPoint = Vector2.new(0.5, 0.5),
+
+							ImageColor3 = Computed(function()
+								return config.TextColor
+							end),
+
+							BackgroundTransparency = 1,
+							BorderSizePixel = 0,
+							Position = UDim2.new(0.5, 0, 0.5, -35),
+							Size = UDim2.fromOffset(170, 170),
+							ZIndex = 13,
+
+							[Children] = {
+								New "Frame" {
+									Name = "Frame",
+									AnchorPoint = Vector2.new(0.5, 0.5),
+
+									BackgroundColor3 = Computed(function()
+										return config.ContainerBackgroundColor
+									end),
+
+									Position = UDim2.fromScale(0.5, 0.5),
+									Size = UDim2.new(0.9, -16, 0.9, -16),
+									ZIndex = 12,
+
+									[Children] = {
+										New "UICorner" {
+											Name = "UICorner",
+											CornerRadius = UDim.new(0, 6)
+										},
+
+										New "Frame" {
+											Name = "Frame1",
+
+											BackgroundColor3 = Computed(function()
+												return config.Accent
+											end),
+
+											Size = UDim2.new(1, 0, 0, 22),
+											ZIndex = 12,
+
+											[Children] = {
+												New "UICorner" {
+													Name = "UICorner1"
+												},
+
+												New "Frame" {
+													Name = "Frame2",
+													AnchorPoint = Vector2.new(0, 1),
+
+													BackgroundColor3 = Computed(function()
+														return config.Accent
+													end),
+
+													BorderSizePixel = 0,
+													Position = UDim2.fromScale(0, 1),
+													Size = UDim2.new(1, 0, 0, 8),
+													ZIndex = 12
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		local preferences = New "TextButton" {
+			Parent = main,
+			Name = "Preferences",
+
+			BackgroundColor3 = Computed(function()
+				return config.ContainerBackgroundColor
+			end),
+
+			BorderSizePixel = 0,
+			Position = UDim2.new(0, 5, 1, -33),
+			Size = UDim2.new(1, -10, 0, 27),
+			AutoButtonColor = false,
+			Font = Enum.Font.Gotham,
+			Text = "Preferences",
+
+			TextColor3 = Computed(function()
+				return config.TextColor
+			end),
+
+			TextSize = 13,
+			TextWrapped = true,
+
+			[OnEvent "MouseButton1Click"] = function()
+				if config.Locked:get() then return end
+
+				Tween(main.DarkFilter, outQuick, { BackgroundTransparency = 0.5 })
+				Tween(main.PreferencesFrame, outSemiQuick, { Position = UDim2.fromScale(0, 1) })
+				config.Locked:set(true)
+			end,
+
+			[Children] = {
+				New "UICorner" {
+					CornerRadius = UDim.new(0, 6)
+				}
+			}
+		}
+
+		preferences.MouseEnter:Connect(function()
+			if not config.Locked:get() then
+				mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+				Tween(preferences, outQuick, { BackgroundColor3 = config.Accent:get() })
+			end
+		end)
+
+		preferences.MouseLeave:Connect(function()
+			if not config.Locked:get() then
+				mouse.Icon = "rbxasset://SystemCursors/Arrow"
+			end
+
+			Tween(preferences, outQuick, { BackgroundColor3 = config.ContainerBackgroundColor:get() })
+		end)
+
+		smoothen(main.Plugin.Pages.Presets.ScrollingFrame)
+		smoothen(main.Plugin.Pages.Tools.ScrollingFrame)
+
+		return main
+	end
+
+	return createGuiObjects
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX1F8BBBABC6144F2E9F24388A3729C842">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">ContainerButtons</string>
+						<string name="ScriptGuid">{57AD1177-19FD-40FD-B55F-1747EC43F537}</string>
+						<ProtectedString name="Source"><![CDATA[return function(widget)
+	local main = _G.UIToolsMain
+
+	local Classes = main:getModule("Classes")
+	local tooltip = main:getModule("Tooltip")
+	local config = main:getModule("Settings")()
+	local TweenService = game:GetService("TweenService")
+	local Selection = game:GetService("Selection")
+
+	local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
+	local outQuick = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local New = Classes.New
+	local Children = Classes.Children
+	local Computed = Classes.Computed
+
+	local function Tween(instance, tweenInfo, goal)
+		local tween = TweenService:Create(instance, tweenInfo, goal)
+		tween:Play()
+
+		return tween
+	end
+
+	local function checkProperty(instance, name)
+		local success = pcall(function()
+			local prop = instance[name]
+		end)
+
+		return success
+	end
+
+	local function createGuiObjects(name, tip)
+		local mouse = plugin:GetMouse()
+		local fixedName = string.gsub(name, "%s", "")
+
+		local button = New "TextButton" {
+			Name = fixedName,
+			AnchorPoint = Vector2.new(0.5, 0.5),
+
+			BackgroundColor3 = Computed(function()
+				return config.DefaultColor
+			end),
+
+			AutoButtonColor = false,
+
+			Font = Enum.Font.Gotham,
+			Text = name,
+
+			TextColor3 = Computed(function()
+				return config.TextColor
+			end),
+
+			TextSize = 13,
+			TextWrapped = true,
+
+			[Children] = {
+				New "UICorner" {
+					CornerRadius = UDim.new(0, 6)
+				},
+
+				New "UIPadding" {
+					PaddingLeft = UDim.new(0, 6),
+					PaddingRight = UDim.new(0, 6)
+				}
+			}
+		}
+
+		button.MouseEnter:Connect(function()
+			if not config.Locked:get() then
+				mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+				Tween(button, outQuick, { BackgroundColor3 = config.Accent:get() })
+			end
+		end)
+
+		button.MouseLeave:Connect(function()
+			if not config.Locked:get() then
+				mouse.Icon = "rbxasset://SystemCursors/Arrow"
+			end
+
+			Tween(button, outQuick, { BackgroundColor3 = config.DefaultColor:get() })
+		end)
+
+		button.MouseButton1Down:Connect(function()
+			if not config.Locked:get() then
+				task.spawn(function()
+					if script:FindFirstChild(fixedName) then
+						local selected = Selection:Get()
+
+						if #selected > 0 then
+							local func = require(script[fixedName])
+							func(button, selected, checkProperty)
+						end
+					end
+				end)
+
+				local effect = New "ImageLabel" {
+					Parent = button,
+					Size = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+
+					BackgroundColor3 = config.Accent:get(),
+
+					Image = "",
+					ImageTransparency = 1,
+					BackgroundTransparency = 0.5,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				}
+
+				local object = Tween(effect, outQuick, { Size = UDim2.new(1, 27, 1, 15), BackgroundTransparency = 1 })
+				object.Completed:Wait()
+				effect:Destroy()
+			end
+		end)
+
+		tooltip(button, tip, widget)
+		return button
+	end
+
+	return createGuiObjects
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+					<Item class="ModuleScript" referent="RBX219AE7059C1B4E25BC7CEDD8AC4F9279">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">UITextSize</string>
+							<string name="ScriptGuid">{DF37E960-7A78-4248-A738-E84AD901A706}</string>
+							<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local history = game:GetService("ChangeHistoryService")
+local selection = game:GetService("Selection")
+local dialog = main:getModule("InputDialog")
+
+return function(button, selected, checkProperty)
+	if #selected == 1 then
+		if checkProperty(selected[1], "TextScaled") then
+			local object = selected[1]
+
+			dialog:open("Insert UITextSizeConstraint", { MinSize = 0, MaxSize = (not object.TextScaled) and object.TextSize or object.TextBounds.Y }, UDim2.fromOffset(36, 36), UDim2.fromOffset(50, 43))
+			local input = dialog:completed()
+
+			if input ~= nil then -- if dialog was not cancelled
+				if object:FindFirstChildOfClass("UITextSizeConstraint") then
+					local constraint = object:FindFirstChildOfClass("UITextSizeConstraint")
+					constraint.MaxTextSize = input.MaxSize
+					constraint.MinTextSize = input.MinSize
+
+					selection:Set({constraint})
+				else
+					local constraint = Instance.new("UITextSizeConstraint")
+					constraint.MaxTextSize = input.MaxSize
+					constraint.MinTextSize = input.MinSize
+					constraint.Parent = object
+
+					selection:Set({constraint})
+				end
+			end
+		end
+	else
+		local selectionTable = {}
+
+		for index, object in ipairs(selected) do
+			if checkProperty(object, "TextScaled") then
+				if object.TextScaled then
+					if object:FindFirstChildOfClass("UITextSizeConstraint") then
+						local constraint =  object:FindFirstChildOfClass("UITextSizeConstraint")
+						constraint.MaxTextSize = object.TextBounds.Y
+
+						table.insert(selectionTable, constraint)
+					else
+						local constraint = Instance.new("UITextSizeConstraint")
+						constraint.MaxTextSize = object.TextBounds.Y
+						constraint.Parent = object
+
+						table.insert(selectionTable, constraint)
+					end
+				else
+					if object:FindFirstChildOfClass("UITextSizeConstraint") then
+						local constraint =  object:FindFirstChildOfClass("UITextSizeConstraint")
+						constraint.MaxTextSize = object.TextSize
+
+						table.insert(selectionTable, constraint)
+					else
+						local constraint = Instance.new("UITextSizeConstraint")
+						constraint.MaxTextSize = object.TextSize
+						constraint.Parent = object
+
+						table.insert(selectionTable, constraint)
+					end
+				end
+			end
+		end
+
+		if #selectionTable > 0 then
+			selection:Set(selectionTable)
+		end
+	end
+
+	history:SetWaypoint("Added UITextSizeConstraint to object(s)")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXFBEF5931AC834DC98DF83F353A78A286">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">UIAspectRatio</string>
+							<string name="ScriptGuid">{14F51C18-3589-4258-8CD4-9E2E7CCD2009}</string>
+							<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local history = game:GetService("ChangeHistoryService")
+local selection = game:GetService("Selection")
+local dialog = main:getModule("InputDialog")
+
+local function truncate(x)
+	return tonumber(string.format("%.2f", x))
+end
+
+return function(button, selected, checkProperty)
+	if #selected == 1 then
+		if checkProperty(selected[1], "AbsoluteSize") then
+			local object = selected[1]
+
+			dialog:open("Insert UIAspectRatio", { Ratio = truncate(object.AbsoluteSize.X / object.AbsoluteSize.Y, 3) }, nil, UDim2.fromOffset(50, 43))
+			local input = dialog:completed()
+
+			if input ~= nil then
+				if object:FindFirstChildOfClass("UIAspectRatioConstraint") then
+					local constraint = object:FindFirstChildOfClass("UIAspectRatioConstraint")
+					constraint.AspectRatio = input.Ratio
+
+					selection:Set({constraint})
+				else
+					local constraint = Instance.new("UIAspectRatioConstraint")
+					constraint.AspectRatio = input.Ratio
+					constraint.Parent = object
+
+					selection:Set({constraint})
+				end
+			end
+		end
+	else
+		local selectionTable = {}
+
+		for index, object in ipairs(selected) do
+			if checkProperty(object, "AbsoluteSize") then
+				if object:FindFirstChildOfClass("UIAspectRatioConstraint") then
+					local constraint = object:FindFirstChildOfClass("UIAspectRatioConstraint")
+					constraint.AspectRatio = object.AbsoluteSize.X / object.AbsoluteSize.Y
+
+					table.insert(selectionTable, constraint)
+				else
+					local constraint = Instance.new("UIAspectRatioConstraint")
+					constraint.AspectRatio = object.AbsoluteSize.X / object.AbsoluteSize.Y
+					constraint.Parent = object
+
+					table.insert(selectionTable, constraint)
+				end
+			end
+		end
+
+		if #selectionTable > 0 then
+			selection:Set(selectionTable)
+		end
+	end
+
+	history:SetWaypoint("Added UIAspectRatioConstraint to object(s)")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXE8DF8FF65BBB4D8B83EADC19CD3538D7">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">UISize</string>
+							<string name="ScriptGuid">{E4FA53FB-01B4-44EC-857C-D9BC6744BA3A}</string>
+							<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local history = game:GetService("ChangeHistoryService")
+local selection = game:GetService("Selection")
+local dialog = main:getModule("InputDialog")
+
+return function(button, selected, checkProperty)
+	if #selected == 1 then
+		if checkProperty(selected[1], "AbsoluteSize") and checkProperty(selected[1], "Size") then
+			local object = selected[1]
+
+			dialog:open("Insert UISizeConstraint", { MinX = 0, MinY = 0, MaxX = math.floor(object.AbsoluteSize.X), MaxY = math.floor(object.AbsoluteSize.Y) }, nil, UDim2.fromOffset(45, 43), { "MinX", "MinY", "MaxX", "MaxY" })
+			local input = dialog:completed()
+
+			if input ~= nil then -- if dialog was not cancelled
+				if object:FindFirstChildOfClass("UISizeConstraint") then
+					local constraint = object:FindFirstChildOfClass("UISizeConstraint")
+					constraint.MaxSize = Vector2.new(input.MaxX, input.MaxY)
+					constraint.MinSize = Vector2.new(input.MinX, input.MinY)
+
+					selection:Set({constraint})
+				else
+					local constraint = Instance.new("UISizeConstraint")
+					constraint.MaxSize = Vector2.new(input.MaxX, input.MaxY)
+					constraint.MinSize = Vector2.new(input.MinX, input.MinY)
+					constraint.Parent = object
+
+					selection:Set({constraint})
+				end
+			end
+		end
+	else
+		local selectionTable = {}
+
+		for index, object in ipairs(selected) do
+			if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Size") then
+				if object:FindFirstChildOfClass("UISizeConstraint") then
+					local constraint = object:FindFirstChildOfClass("UISizeConstraint")
+					constraint.MaxSize = Vector2.new(object.AbsoluteSize.X, object.AbsoluteSize.Y)
+
+					table.insert(selectionTable, constraint)
+				else
+					local constraint = Instance.new("UISizeConstraint")
+					constraint.MaxSize = Vector2.new(object.AbsoluteSize.X, object.AbsoluteSize.Y)
+					constraint.Parent = object
+
+					table.insert(selectionTable, constraint)
+				end
+			end
+		end
+
+		if #selectionTable > 0 then
+			selection:Set(selectionTable)
+		end
+	end
+
+	history:SetWaypoint("Added UISizeConstraint to object(s)")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXE49270CE216541ACBF8E43022F67C249">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">BottomRight</string>
+							<string name="ScriptGuid">{D362E444-699B-4DDF-8C6D-9A07F5478FFD}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(1, 1)
+			object.Position = UDim2.new(1, 0, 1, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX49EEEFFD05184F158613C6FB19C29494">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">TransparentBackground</string>
+							<string name="ScriptGuid">{74C290F5-694E-4DF7-BFEA-86788E1E774B}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "BackgroundTransparency") then
+			object.BackgroundTransparency = 1
+		end
+	end
+
+	history:SetWaypoint("Transparent Background")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX6B1E967F84A84FA9B4693D603DEADDB7">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">UIPadding</string>
+							<string name="ScriptGuid">{85BA503D-1382-4C55-9367-76D96A3C15A4}</string>
+							<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local history = game:GetService("ChangeHistoryService")
+local selection = game:GetService("Selection")
+local dialog = main:getModule("InputDialog")
+
+local function truncate(x, n)
+	return x-x % 10^(-n)
+end
+
+return function(button, selected, checkProperty)
+	local first
+
+	for index, object in ipairs(selected) do
+		if object:FindFirstChildOfClass("UIPadding") then
+			first = object:FindFirstChildOfClass("UIPadding")
+		end
+	end
+
+	local scale = first and truncate(first.PaddingBottom.Scale, 2) or 0
+	local offset = first and truncate(first.PaddingBottom.Offset, 2) or 4
+
+	dialog:open("Insert UIPadding", { Scale = scale, Offset = offset })
+	local input = dialog:completed()
+
+	if input ~= nil then
+		local selectionTable = {}
+		for index, object in ipairs(selected) do
+			if object:IsA("GuiBase2d") then
+				if object:FindFirstChildOfClass("UIPadding") then
+					local constraint = object:FindFirstChildOfClass("UIPadding")
+					constraint.PaddingBottom = UDim.new(input.Scale, input.Offset)
+					constraint.PaddingRight = UDim.new(input.Scale, input.Offset)
+					constraint.PaddingLeft = UDim.new(input.Scale, input.Offset)
+					constraint.PaddingTop = UDim.new(input.Scale, input.Offset)
+
+					table.insert(selectionTable, constraint)
+				else
+					local constraint = Instance.new("UIPadding")
+					constraint.PaddingBottom = UDim.new(input.Scale, input.Offset)
+					constraint.PaddingRight = UDim.new(input.Scale, input.Offset)
+					constraint.PaddingLeft = UDim.new(input.Scale, input.Offset)
+					constraint.PaddingTop = UDim.new(input.Scale, input.Offset)
+					constraint.Parent = object
+
+					table.insert(selectionTable, constraint)
+				end
+			end
+		end
+
+		if #selectionTable > 0 then
+			selection:Set(selectionTable)
+		end
+	end
+
+	history:SetWaypoint("Added UIPadding to object(s)")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX512C221B5F1549AFAAFCD4A6A86AA604">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">TopLeft</string>
+							<string name="ScriptGuid">{CA10DFE9-3989-4F91-95C5-F1943165A5B4}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(0, 0)
+			object.Position = UDim2.new(0, 0, 0, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX22100A378BA345F1B86503637D95B1C2">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">Top</string>
+							<string name="ScriptGuid">{411A3A80-9D50-4295-8927-A222900669A3}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(0.5, 0)
+			object.Position = UDim2.new(0.5, 0, 0, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXE42174A976424E1094E095AB67744380">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">TopRight</string>
+							<string name="ScriptGuid">{FC02A7D7-ECE4-4197-AAE9-E561AD6DEDE7}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(1, 0)
+			object.Position = UDim2.new(1, 0, 0, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX5C77D2BE31E54B4CA1B20CC6DC6CA1DD">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">Left</string>
+							<string name="ScriptGuid">{4ED943D1-B09B-4659-BDFC-0084D44EDEF7}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(0, 0.5)
+			object.Position = UDim2.new(0, 0, 0.5, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXF016F534C7594BC2803226C1F8E17EB4">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">Center</string>
+							<string name="ScriptGuid">{C05310E6-594A-4701-91E7-B38ED84B34B7}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(0.5, 0.5)
+			object.Position = UDim2.new(0.5, 0, 0.5, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXBBCE8985FAA8431DBDB03073032CE93E">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">Right</string>
+							<string name="ScriptGuid">{364C518D-90B8-46A3-A393-909C91BCDC43}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(1, 0.5)
+			object.Position = UDim2.new(1, 0, 0.5, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXDB4864EADD06400AB669EEBE3763D0B6">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">BottomLeft</string>
+							<string name="ScriptGuid">{0E15A9E5-8A05-42BD-9C34-428658625E19}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(0, 1)
+			object.Position = UDim2.new(0, 0, 1, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX6D2606011936401BB4086965A96B7D7C">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">Bottom</string>
+							<string name="ScriptGuid">{75C5421F-8FC1-4BA0-AE3D-D302ED621A37}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AnchorPoint") and checkProperty(object, "Position") then
+			object.AnchorPoint = Vector2.new(0.5, 1)
+			object.Position = UDim2.new(0.5, 0, 1, 0)
+		end
+	end
+
+	history:SetWaypoint("Positioning")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX9949A6BD4D1B4286AE0D213659F6A316">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">RemoveBorders</string>
+							<string name="ScriptGuid">{62303C98-BC41-4472-B8DC-EB08D803AC37}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "BorderSizePixel") then
+			object.BorderSizePixel = 0
+		end
+	end
+
+	history:SetWaypoint("Remove Borders")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXF057E1FB7B314328B2AA09C75FEAC463">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">FitImage</string>
+							<string name="ScriptGuid">{68D9C248-FBE4-4862-A1D8-A2621E1AE5B5}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "ScaleType") then
+			object.ScaleType = Enum.ScaleType.Fit
+		end
+	end
+
+	history:SetWaypoint("Fit Image")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX2A6FC3A77CE44689AACAEFF77A903583">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">ScaleSize</string>
+							<string name="ScriptGuid">{6AFDEBE1-4F9A-4D88-A211-DF7A361A8CAE}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+local camera = workspace.CurrentCamera
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Size") then
+			local viewportSize = camera.ViewportSize
+			local absSize = object.AbsoluteSize
+
+			if checkProperty(object.Parent, "AbsoluteSize") then
+				viewportSize = object.Parent.AbsoluteSize
+			end
+
+			object.Size = UDim2.fromScale(absSize.X / viewportSize.X, absSize.Y / viewportSize.Y)
+		elseif checkProperty(object, "CornerRadius") then
+			local size = checkProperty(object.Parent, "AbsoluteSize") and object.Parent.AbsoluteSize or camera.ViewportSize
+			local scale = object.CornerRadius.Offset / size.Y
+
+			object.CornerRadius = UDim.new(object.CornerRadius.Scale + scale, 0)
+		elseif checkProperty(object, "CellSize") then
+			local size = checkProperty(object.Parent, "AbsoluteSize") and object.Parent.AbsoluteSize or camera.ViewportSize
+
+			local x = object.CellSize.X.Offset / size.X
+			local y = object.CellSize.Y.Offset / size.Y
+
+			object.CellSize = UDim2.fromScale(x, y)
+		end
+	end
+
+	history:SetWaypoint("Scaled Size")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXB9861749234F4EA68D612EBF23A13FEA">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">ScalePosition</string>
+							<string name="ScriptGuid">{65BF07F7-4AA7-4EE0-9C85-3B9CBBA73432}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+local camera = workspace.CurrentCamera
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Position") then
+			local pos = object.Position
+			local absSize = camera.ViewportSize
+
+			if checkProperty(object.Parent, "AbsoluteSize") then
+				absSize = object.Parent.AbsoluteSize
+			end
+
+			local x = pos.X.Offset / absSize.X + pos.X.Scale
+			local y = pos.Y.Offset / absSize.Y + pos.Y.Scale
+
+			object.Position = UDim2.fromScale(x, y)
+		end
+	end
+
+	history:SetWaypoint("Scaled Position")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX85BF0F87758F47649D3297A698789D95">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">OffsetPosition</string>
+							<string name="ScriptGuid">{EDD611BF-8AC3-425A-92D8-09C4BC10ABF2}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+local camera = workspace.CurrentCamera
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Position") then
+			local pos = object.Position
+			local absSize = camera.ViewportSize
+
+			if checkProperty(object.Parent, "AbsoluteSize") then
+				absSize = object.Parent.AbsoluteSize
+			end
+
+			local x = pos.X.Scale * absSize.X + pos.X.Offset
+			local y = pos.Y.Scale * absSize.Y + pos.Y.Offset
+
+			object.Position = UDim2.fromOffset(x, y)
+		end
+	end
+
+	history:SetWaypoint("Offset Position")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXC24FED3D614E43778FB474F88CF77538">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">OffsetSize</string>
+							<string name="ScriptGuid">{402FAA9F-C4A4-4C41-8791-3D38BF8ACB6F}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+local camera = workspace.CurrentCamera
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Size") then
+			local absSize = object.AbsoluteSize
+			object.Size = UDim2.fromOffset(absSize.X, absSize.Y)
+		elseif checkProperty(object, "CornerRadius") then
+			local size = checkProperty(object.Parent, "AbsoluteSize") and object.Parent.AbsoluteSize or camera.ViewportSize
+			local offset = object.CornerRadius.Scale * size.Y
+
+			object.CornerRadius = UDim.new(0, object.CornerRadius.Offset + offset)
+		elseif checkProperty(object, "CellSize") then
+			local size = checkProperty(object.Parent, "AbsoluteSize") and object.Parent.AbsoluteSize or camera.ViewportSize
+
+			local x = object.CellSize.X.Scale * size.X
+			local y = object.CellSize.Y.Scale * size.Y
+
+			object.CellSize = UDim2.fromOffset(x, y)
+		end
+	end
+
+	history:SetWaypoint("Offset Size")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXD5BA926E291E413BA2E9A8ECB7FF2CA3">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">FastScale</string>
+							<string name="ScriptGuid">{5BA4112B-4ECD-4CC4-A75E-AE6291C0F704}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+local camera = workspace.CurrentCamera
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Size") then
+			local viewportSize = camera.ViewportSize
+			local absSize = object.AbsoluteSize
+
+			if checkProperty(object.Parent, "AbsoluteSize") then
+				viewportSize = object.Parent.AbsoluteSize
+			end
+
+			object.Size = UDim2.fromScale(absSize.X / viewportSize.X, absSize.Y / viewportSize.Y)
+
+			if object:FindFirstChildOfClass("UIAspectRatioConstraint") then
+				local constraint = object:FindFirstChildOfClass("UIAspectRatioConstraint")
+				constraint.AspectRatio = object.AbsoluteSize.X / object.AbsoluteSize.Y
+			else
+				local constraint = Instance.new("UIAspectRatioConstraint")
+				constraint.AspectRatio = object.AbsoluteSize.X / object.AbsoluteSize.Y
+				constraint.Parent = object
+			end
+		end
+
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Position") then
+			local pos = object.Position
+			local absSize = camera.ViewportSize
+
+			if checkProperty(object.Parent, "AbsoluteSize") then
+				absSize = object.Parent.AbsoluteSize
+			end
+
+			local x = pos.X.Offset / absSize.X + pos.X.Scale
+			local y = pos.Y.Offset / absSize.Y + pos.Y.Scale
+
+			object.Position = UDim2.fromScale(x, y)
+		end
+
+		if checkProperty(object, "CornerRadius") then
+			local size = checkProperty(object.Parent, "AbsoluteSize") and object.Parent.AbsoluteSize or camera.ViewportSize
+			local scale = object.CornerRadius.Offset / size.Y
+
+			object.CornerRadius = UDim.new(object.CornerRadius.Scale + scale, 0)
+		end
+
+		if checkProperty(object, "CellSize") then
+			local size = checkProperty(object.Parent, "AbsoluteSize") and object.Parent.AbsoluteSize or camera.ViewportSize
+
+			local x = object.CellSize.X.Offset / size.X
+			local y = object.CellSize.Y.Offset / size.Y
+
+			object.CellSize = UDim2.fromScale(x, y)
+
+		end
+	end
+
+	history:SetWaypoint("Fast Scale")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXBBC28918DB9C4E0A8480F84BFAEF4C2A">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">UIScale</string>
+							<string name="ScriptGuid">{9210B323-9EAE-4241-BD7D-2F1649502758}</string>
+							<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local history = game:GetService("ChangeHistoryService")
+local selection = game:GetService("Selection")
+local dialog = main:getModule("InputDialog")
+
+return function(button, selected, checkProperty)
+	local selectionTable = {}
+
+	dialog:open("Insert UIScale", { Scale = 1 })
+	local input = dialog:completed()
+
+	if input ~= nil then
+		for index, object in ipairs(selected) do
+			if object:IsA("GuiBase2d") then
+				if not object:FindFirstChildOfClass("UIListLayout") then
+					local constraint = Instance.new("UIScale")
+					constraint.Scale = input.Scale
+					constraint.Parent = object
+
+					table.insert(selectionTable, constraint)
+				end
+			end
+
+			if #selectionTable > 0 then
+				selection:Set(selectionTable)
+			end
+		end
+	end
+
+	history:SetWaypoint("Added UIScale to object(s)")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBXCE5A219494504F3D8521DBEB11C601FC">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">UICorner</string>
+							<string name="ScriptGuid">{AAB32744-B629-42D1-AEAE-9587DC38A1ED}</string>
+							<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local history = game:GetService("ChangeHistoryService")
+local selection = game:GetService("Selection")
+local dialog = main:getModule("InputDialog")
+
+local function truncate(x, n)
+	return x-x % 10^(-n)
+end
+
+return function(button, selected, checkProperty)
+	local first
+
+	for index, object in ipairs(selected) do
+		if object:FindFirstChildOfClass("UICorner") then
+			first = object:FindFirstChildOfClass("UICorner")
+		end
+	end
+
+	local scale = first and truncate(first.CornerRadius.Scale, 2) or 0
+	local offset = first and truncate(first.CornerRadius.Offset, 2) or 8
+
+	dialog:open("Insert UICorner", { Scale = scale, Offset = offset }, nil, UDim2.fromOffset(43, 43))
+	local input = dialog:completed()
+
+	if input ~= nil then
+		local selectionTable = {}
+		for index, object in ipairs(selected) do
+			if object:IsA("GuiBase2d") then
+				if object:FindFirstChildOfClass("UICorner") then
+					local constraint = object:FindFirstChildOfClass("UICorner")
+					constraint.CornerRadius = UDim.new(input.Scale, input.Offset)
+
+					table.insert(selectionTable, constraint)
+				else
+					local constraint = Instance.new("UICorner")
+					constraint.CornerRadius = UDim.new(input.Scale, input.Offset)
+					constraint.Parent = object
+
+					table.insert(selectionTable, constraint)
+				end
+			end
+		end
+
+		if #selectionTable > 0 then
+			selection:Set(selectionTable)
+		end
+	end
+
+	history:SetWaypoint("Added UICorner to object(s)")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX13A4B4DE54F143AF93C020A342780D82">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">CustomLayout</string>
+							<string name="ScriptGuid">{59C85267-C0E3-458F-A69B-39FA9CF5FF25}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+local anchors = {
+	horizontal = {
+		[Enum.HorizontalAlignment.Left] = Vector2.new(),
+		[Enum.HorizontalAlignment.Center] = Vector2.new(0.5),
+		[Enum.HorizontalAlignment.Right] = Vector2.new(1)
+	},
+
+	vertical = {
+		[Enum.VerticalAlignment.Top] = Vector2.new(),
+		[Enum.VerticalAlignment.Center] = Vector2.new(0, 0.5),
+		[Enum.VerticalAlignment.Bottom] = Vector2.new(0, 1)
+	},
+}
+
+local function sort(layout, children)
+	for i, child in ipairs(children) do
+		local horizontal = layout.FillDirection == Enum.FillDirection.Horizontal
+		local padding = (child.Parent.AbsoluteSize.Y * layout.Padding.Scale) + layout.Padding.Offset
+		local anchor = anchors.horizontal[layout.HorizontalAlignment] + anchors.vertical[layout.VerticalAlignment]
+		local abs = child.AbsoluteSize
+
+		local offset = ((anchor.X == 1 or (not horizontal and (anchor.Y == 1) or false)) and -1 or 1) * (padding + (horizontal and abs.X or abs.Y)) * (i-1)
+
+		-- re-sort based on the sort order
+		table.sort(children, function(a, b)
+			if layout.SortOrder == Enum.SortOrder.LayoutOrder then
+				if horizontal then
+					return a.AbsolutePosition.X < b.AbsolutePosition.X
+				else
+					return a.AbsolutePosition.Y < b.AbsolutePosition.Y
+				end
+			else
+				return a.LayoutOrder < b.LayoutOrder
+			end
+		end)
+
+		if anchor.X == 0.5 or anchor.Y == 0.5 then
+			if #children == 0 then return end
+
+			-- for center alignment, 1 is odd and 0 is even
+			if #children % 2 == 0 then
+				-- we start from the center by finding the 2 center elements
+				local h = #children * 0.5
+				local x1, x2 = children[h], children[h+1]
+				local s1, s2 = -((abs.X * 0.5) + (padding * 0.5)), -((abs.Y * 0.5) + (padding * 0.5))
+				local n1, n2 = -(abs.X + padding), -(abs.Y + padding)
+				local left = UDim2.new(anchor.X, horizontal and s1 or 0, anchor.Y, horizontal and 0 or s2)
+				local right = UDim2.new(anchor.X, horizontal and -s1 or 0, anchor.Y, horizontal and 0 or -s2)
+
+				if #children == 2 then
+					children[1].Position = left; children[1].AnchorPoint = anchor
+					children[2].Position = right; 					children[2].AnchorPoint = anchor
+
+				elseif #children == 1 then
+					children[1].Position = UDim2.fromScale(anchor.X, anchor.Y); children[1].AnchorPoint = anchor
+				else
+					children[h].Position = left; children[h].AnchorPoint = anchor
+					children[h+1].Position = right; children[h+1].AnchorPoint = anchor
+
+					-- the left side
+					do
+						local idx = 0
+
+						for x = h-1, 1, -1 do
+							idx += 1
+							children[x].AnchorPoint = anchor
+							children[x].Position = UDim2.new(anchor.X, horizontal and (n1+s1) * i or 0, anchor.Y, horizontal and 0 or (n2+s2) * i)
+						end
+					end
+
+					-- the right side
+					do
+						local idx = 0
+
+						for x = h+2, #children do
+							idx += 1
+							children[x].AnchorPoint = anchor
+							children[x].Position = UDim2.new(anchor.X, horizontal and -(n1+s1) * i or 0, anchor.Y, horizontal and 0 or -(n2+s2) * i)
+						end
+					end
+
+					return
+				end
+			else
+				-- position the center element
+				local c = math.ceil(#children * 0.5)
+				local s1, s2 = -(abs.X + padding), -(abs.Y + padding)
+				local center = #children == 1 and children[1] or children[c]
+
+				center.Position = UDim2.fromScale(anchor.X, anchor.Y); center.AnchorPoint = anchor
+
+				-- the left side
+				do
+					local idx = 0
+
+					for x = c-1, 1, -1 do
+						idx += 1
+						children[x].AnchorPoint = anchor
+						children[x].Position = UDim2.new(anchor.X, horizontal and s1 * i or 0, anchor.Y, horizontal and 0 or s2 * i)
+					end
+				end
+
+				-- the right side
+				do
+					local idx = 0
+
+					for x = c+1, #children do
+						idx += 1
+						children[x].AnchorPoint = anchor
+						children[x].Position = UDim2.new(anchor.X, horizontal and -s1 * i or 0, anchor.Y, horizontal and 0 or -s2 * i)
+					end
+				end
+
+				return
+			end
+		else
+			-- for other alignments
+			child.AnchorPoint = anchor
+			child.Position = UDim2.new(anchor.X, horizontal and offset or 0, anchor.Y, horizontal and 0 or offset)
+		end
+	end
+end
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsolutePosition") and checkProperty(object.Parent, "AbsolutePosition") then
+			if object:FindFirstChildOfClass("UIListLayout") then
+				local children = object:GetChildren()
+				local layout = object:FindFirstChildOfClass("UIListLayout")
+
+				-- filter the table
+				table.foreachi(children, function(i, v)
+					if not checkProperty(v, "AbsolutePosition") then
+						table.remove(children, i)
+					end
+				end)
+
+				sort(layout, children)
+				layout:Remove()
+			end
+		end
+	end
+
+	history:SetWaypoint("No Layout")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+					<Item class="ModuleScript" referent="RBX801D519C6BE948A2A2FBEEF99FE6AD8E">
+						<Properties>
+							<BinaryString name="AttributesSerialize"></BinaryString>
+							<Content name="LinkedSource"><null></null></Content>
+							<string name="Name">FitParent</string>
+							<string name="ScriptGuid">{D4C32E1F-AA5F-4D7C-AAE2-1A8A3657B766}</string>
+							<ProtectedString name="Source"><![CDATA[local history = game:GetService("ChangeHistoryService")
+
+return function(button, selected, checkProperty)
+	for index, object in ipairs(selected) do
+		if checkProperty(object, "AbsoluteSize") and checkProperty(object, "Size") then
+			object.Size = UDim2.fromScale(1, 1)
+		end
+	end
+
+	history:SetWaypoint("Fit Parent")
+end]]></ProtectedString>
+							<int64 name="SourceAssetId">-1</int64>
+							<BinaryString name="Tags"></BinaryString>
+						</Properties>
+					</Item>
+				</Item>
+				<Item class="ModuleScript" referent="RBX8B5DE0E6E7784CDA923BF7E2FF4E5EB0">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Gradients</string>
+						<string name="ScriptGuid">{6809C55E-DA1A-48ED-B3C2-FC59DC7201E1}</string>
+						<ProtectedString name="Source"><![CDATA[return function()
+	return function(dataset, parent, widget)
+		local main = _G.UIToolsMain
+
+		local Classes = main:getModule("Classes")
+		local colorDialog = main:getModule("ColorDialog")
+		local config = main:getModule("Settings")()
+		local DataManager = main:getModule("DataManager")
+		local tooltip = main:getModule("Tooltip")
+
+		local TweenService = game:GetService("TweenService")
+		local Selection = game:GetService("Selection")
+		local ChangeHistoryService = game:GetService("ChangeHistoryService")
+		local CollectionService = game:GetService("CollectionService")
+
+		local New = Classes.New
+		local Children = Classes.Children
+		local Computed = Classes.Computed
+		local OnEvent = Classes.OnEvent
+
+		local sets = {}
+		local setsToSave = {}
+
+		local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+		local mouse = plugin:GetMouse()
+
+		local outQuick = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+		local function Tween(instance, tweenInfo, goal)
+			local tween = TweenService:Create(instance, tweenInfo, goal)
+			tween:Play()
+
+			return tween
+		end
+
+		local function checkProperty(instance, name)
+			local success = pcall(function()
+				local prop = instance[name]
+			end)
+
+			return success
+		end
+
+		local function getColorFromString(str)
+			return Color3.new(table.unpack(string.split(str, ", ")))
+		end
+
+		local function getStringFromColor(color)
+			return tostring(color)
+		end
+
+		local function hover(add)
+			add.MouseEnter:Connect(function()
+				if not config.Locked:get() then
+					mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+					Tween(add, outQuick, { BackgroundColor3 = config.Accent:get() })
+				end
+			end)
+
+			add.MouseLeave:Connect(function()
+				if not config.Locked:get() then
+					mouse.Icon = "rbxasset://SystemCursors/Arrow"
+				end
+
+				Tween(add, outQuick, { BackgroundColor3 = config.DefaultColor:get() })
+			end)
+
+			add.MouseButton1Down:Connect(function()
+				if config.Locked:get() then return end
+
+				local effect = New "ImageLabel" {
+					Parent = add,
+					Size = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+
+					BackgroundColor3 = config.Accent:get(),
+
+					Image = "",
+					ImageTransparency = 1,
+					BackgroundTransparency = 0.5,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				}
+
+				local object = Tween(effect, outQuick, { Size = UDim2.new(1, 27, 1, 15), BackgroundTransparency = 1 })
+				object.Completed:Wait()
+				effect:Destroy()
+			end)
+		end
+
+		local function setupSet(data, parent)
+			local set = data.set
+
+			hover(set.Apply)
+
+			local function setColor(obj)
+				if config.Locked:get() or colorDialog._dialog then return end
+
+				colorDialog:open(obj.BackgroundColor3)
+				local color = colorDialog:completed()
+
+				if color then
+					obj.BackgroundColor3 = color
+					setsToSave[set.LayoutOrder][obj.Name:lower()] = getStringFromColor(color)
+
+					DataManager.data.Gradients = setsToSave
+					DataManager.save()
+				end
+			end
+
+			set.Color1.MouseButton1Down:Connect(function()
+				setColor(set.Color1)
+			end)
+
+			set.Color2.MouseButton1Down:Connect(function()
+				setColor(set.Color2)
+			end)
+
+			set.Apply.MouseButton1Down:Connect(function()
+				if config.Locked:get() then return end
+
+				local currentSelection = Selection:Get()
+				local finalSelection
+
+				for index, selected in ipairs(currentSelection) do
+					pcall(function()
+						local itemParent = selected.Parent
+						local singleItem = selected:Clone()
+						singleItem:ClearAllChildren()
+
+						local function callback(gradient)
+							if not finalSelection then
+								finalSelection = {}
+							end
+
+							local children = {}
+
+							for index, child in ipairs(selected:GetDescendants()) do
+								table.insert(children, child:Clone())
+							end
+
+							gradient["Color"] = ColorSequence.new({
+								ColorSequenceKeypoint.new(0, set.Color1.BackgroundColor3),
+								ColorSequenceKeypoint.new(1, set.Color2.BackgroundColor3)
+							})
+
+							for name, value in pairs(selected:GetAttributes()) do
+								singleItem:SetAttribute(name, value)
+							end
+
+							for _, tag in pairs(CollectionService:GetTags(selected)) do
+								CollectionService:AddTag(singleItem, tag)
+							end
+
+							for index, child in ipairs(children) do
+								child.Parent = singleItem
+							end
+
+							selected:Remove()
+							singleItem.Parent = itemParent
+
+							if gradient.Parent == nil then
+								gradient.Parent = singleItem
+							end
+
+							table.insert(finalSelection, gradient)
+							table.clear(children)
+						end
+
+						if checkProperty(singleItem, "Color") then
+							if typeof(singleItem["Color"]) == "ColorSequence" then
+								callback(singleItem)
+							end
+						else
+							if singleItem:IsA("GuiBase2d") then
+								if selected:FindFirstChildOfClass("UIGradient") then
+									selected:FindFirstChildOfClass("UIGradient"):Remove()
+								end
+
+								callback(Instance.new("UIGradient"))
+							end
+						end
+
+						ChangeHistoryService:SetWaypoint("Used a color set")
+					end)
+
+					if finalSelection then
+						Selection:Set(finalSelection)
+					end
+				end
+			end)
+
+			set.Delete.MouseButton1Down:Connect(function()
+				if not config.Locked:get() then
+					if #parent:GetChildren() == 5 then
+						table.clear(sets)
+						table.clear(setsToSave)
+
+						parent.Parent.Size = UDim2.new(1, 0, 0, 66)
+					else
+						table.remove(sets, set.LayoutOrder)
+						table.remove(setsToSave, set.LayoutOrder)
+
+						parent.Parent.Size = UDim2.new(1, 0, 0, parent.Parent.Size.Y.Offset - 51)
+					end
+
+					for index, set in ipairs(sets) do
+						set.LayoutOrder = index
+					end
+
+					DataManager.data.Gradients = setsToSave
+					DataManager.save()
+
+					set:Destroy()
+				end
+			end)
+
+			tooltip(set.Delete, "Delete", widget)
+		end
+
+		local function createSet(data)
+			setsToSave[#setsToSave + 1] = {
+				color1 = data.color1,
+				color2 = data.color2
+			}
+
+			local set = New "Frame" {
+				Name = "GradientSet",
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = #setsToSave,
+				Size = UDim2.fromOffset(100, 100),
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "ImageButton" {
+						Name = "Color1",
+						BackgroundColor3 = getColorFromString(data.color1),
+						Size = UDim2.fromOffset(36, 36),
+						AutoButtonColor = false,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							}
+						},
+
+						[OnEvent "MouseEnter"] = function()
+							if config.Locked:get() then return end
+							mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+						end,
+
+						[OnEvent "MouseLeave"] = function()
+							mouse.Icon = "rbxasset://SystemCursors/Arrow"
+						end
+					},
+
+					New "ImageButton" {
+						Name = "Color2",
+						BackgroundColor3 = getColorFromString(data.color2),
+						Position = UDim2.fromOffset(46, 0),
+						Size = UDim2.fromOffset(36, 36),
+						AutoButtonColor = false,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							}
+						},
+
+						[OnEvent "MouseEnter"] = function()
+							if config.Locked:get() then return end
+							mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+						end,
+
+						[OnEvent "MouseLeave"] = function()
+							mouse.Icon = "rbxasset://SystemCursors/Arrow"
+						end
+					},
+
+					New "ImageButton" {
+						Name = "Delete",
+						AnchorPoint = Vector2.new(1, 0.5),
+						BackgroundTransparency = 1,
+						Position = UDim2.new(1, 5, 0.5, 0),
+						Size = UDim2.fromOffset(36, 36),
+						Image = "rbxassetid://9906861600",
+						ImageColor3 = Color3.fromRGB(255, 51, 51),
+
+						[OnEvent "MouseEnter"] = function()
+							if config.Locked:get() then return end
+							mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+						end,
+
+						[OnEvent "MouseLeave"] = function()
+							mouse.Icon = "rbxasset://SystemCursors/Arrow"
+						end,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							}
+						}
+					},
+
+					New "TextButton" {
+						Name = "Apply",
+						AnchorPoint = Vector2.new(1, 0),
+
+						BackgroundColor3 = Computed(function()
+							return config.DefaultColor
+						end),
+
+						BorderColor3 = Color3.new(),
+						BorderSizePixel = 0,
+						Position = UDim2.new(1, -38, 0, 0),
+						Size = UDim2.new(1, -130, 1, 0),
+						AutoButtonColor = false,
+						Font = Enum.Font.Gotham,
+						Text = "Apply",
+
+						TextColor3 = Computed(function()
+							return config.TextColor
+						end),
+
+						TextSize = 13,
+						TextWrapped = true,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							},
+
+							New "UIPadding" {
+								PaddingLeft = UDim.new(0, 6),
+								PaddingRight = UDim.new(0, 6)
+							}
+						}
+					}
+				}
+			}
+
+			tooltip(set.Color1, "Color1", widget)
+			tooltip(set.Color2, "Color2", widget)
+
+			table.insert(sets, set)
+			return set
+		end
+
+		local add = New "Frame" {
+			Name = "Add",
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.fromOffset(100, 100),
+
+			[Children] = {
+				New "TextButton" {
+					Name = "New",
+
+					BackgroundColor3 = Computed(function()
+						return config.DefaultColor
+					end),
+
+					BorderColor3 = Color3.new(),
+					BorderSizePixel = 0,
+					Size = UDim2.fromScale(1, 1),
+					AutoButtonColor = false,
+					Font = Enum.Font.Gotham,
+					Text = "Add gradient set",
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 13,
+					TextWrapped = true,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "UIPadding" {
+							PaddingLeft = UDim.new(0, 6),
+							PaddingRight = UDim.new(0, 6)
+						}
+					}
+				}
+			}
+		}
+
+		hover(add.New)
+
+		add.Parent = parent
+		add.New.MouseButton1Down:Connect(function()
+			if config.Locked:get() then return end
+
+			parent.Parent.Size = UDim2.new(1, 0, 0, 66 + (#sets + 1) * 51)
+
+			local set = createSet({ color1 = "1, 1, 1", color2 = "0, 0, 0" })
+			set.Parent = parent
+
+			setupSet({ set = set }, parent)
+
+			DataManager.data.Gradients = setsToSave
+			DataManager.save()
+		end)
+
+		for index, data in ipairs(dataset) do
+			local set = createSet(data)
+			set.Parent = parent
+
+			setupSet({
+				set = set,
+				color1 = data.color1,
+				color2 = data.color2
+			}, parent)
+		end
+
+		parent.Parent.Size = UDim2.new(1, 0, 0, 66 + (#sets) * 51)
+	end
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX673526F729F844BDB313906B9D3E85BD">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Navbar</string>
+						<string name="ScriptGuid">{75DDA5C4-E011-4FD2-A074-02F66BE481AD}</string>
+						<ProtectedString name="Source"><![CDATA[return function()
+	local main = _G.UIToolsMain
+
+	local TweenService = game:GetService("TweenService")
+	local TextService = game:GetService("TextService")
+	local Classes = main:getModule("Classes")
+	local config = main:getModule("Settings")()
+
+	local New = Classes.New
+	local Children = Classes.Children
+	local Computed = Classes.Computed
+
+	local outQuick = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+	local mouse = plugin:GetMouse()
+
+	local function Tween(instance, tweenInfo, goal, yield)
+		local tween = TweenService:Create(instance, tweenInfo, goal)
+		tween:Play()
+
+		if yield then
+			tween.Completed:Wait()
+		end
+
+		return tween
+	end
+
+	local function createGuiObjects(pages)
+		local navbar = New "Frame" {
+			Name = "Navbar",
+			AnchorPoint = Vector2.new(0.5, 0),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Position = UDim2.new(0.5, 0, 0, 5),
+			Size = UDim2.new(1, -7, 0, 30),
+
+			[Children] = {
+				New "TextButton" {
+					Name = "Presets",
+					Font = Enum.Font.Gotham,
+					Text = "Presets",
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 13,
+					AutoButtonColor = false,
+					AnchorPoint = Vector2.new(1, 0),
+
+					BackgroundColor3 = Computed(function()
+						return config.ContainerBackgroundColor
+					end),
+
+					Position = UDim2.new(1, -3, 0, 2),
+					Size = UDim2.new(0.5, -6, 1, 0),
+
+					[Children] = {
+						New "UICorner" {
+							Name = "UICorner",
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				},
+
+				New "TextButton" {
+					Name = "Tools",
+					Font = Enum.Font.Gotham,
+					Text = "Tools",
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 13,
+					AutoButtonColor = false,
+
+					BackgroundColor3 = Computed(function()
+						return config.ContainerBackgroundColor
+					end),
+
+					Size = UDim2.new(0.5, -6, 1, 0),
+					Position = UDim2.fromOffset(3, 2),
+
+					[Children] = {
+						New "UICorner" {
+							Name = "UICorner1",
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				}
+			}
+		}
+
+		local function effects(button)
+			button.MouseEnter:Connect(function()
+				if not config.Locked:get() then
+					mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+					Tween(button, outQuick, { BackgroundColor3 = config.Accent:get() })
+				end
+			end)
+
+			button.MouseLeave:Connect(function()
+				mouse.Icon = "rbxasset://SystemCursors/Arrow"
+				Tween(button, outQuick, { BackgroundColor3 = config.ContainerBackgroundColor:get() })
+			end)
+
+			button.MouseButton1Click:Connect(function()
+				if config.Locked:get() then return end
+
+				if pages:FindFirstChild(button.Name) then
+					pages.UIPageLayout:JumpTo(pages[button.Name])
+				end
+
+				local effect = New "ImageLabel" {
+					Parent = button,
+					Size = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+
+					BackgroundColor3 = config.Accent:get(),
+
+					Image = "",
+					ImageTransparency = 1,
+					BackgroundTransparency = 0.5,
+					ZIndex = 20,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				}
+
+				local object = Tween(effect, outQuick, { Size = UDim2.new(1, 15, 1, 15), BackgroundTransparency = 1 })
+				object.Completed:Wait()
+				effect:Destroy()
+			end)
+		end
+
+		effects(navbar.Tools)
+		effects(navbar.Presets)
+
+		return navbar
+	end
+
+	return createGuiObjects
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX11299CCCD943422A9BD653FF2433B6A9">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Conversions</string>
+						<string name="ScriptGuid">{B55DF779-9FF1-40EA-B054-2DB4907871E2}</string>
+						<ProtectedString name="Source"><![CDATA[return function()
+	return function(dataset, parent, widget)
+		local main = _G.UIToolsMain
+
+		local Classes = main:getModule("Classes")
+		local config = main:getModule("Settings")()
+		local dialog = main:getModule("InputDialog")
+		local DataManager = main:getModule("DataManager")
+		local ClassManager = main:getModule("ClassManager")
+		local tooltip = main:getModule("Tooltip")
+
+		local TweenService = game:GetService("TweenService")
+		local Selection = game:GetService("Selection")
+		local ChangeHistoryService = game:GetService("ChangeHistoryService")
+
+		local New = Classes.New
+		local Children = Classes.Children
+		local Computed = Classes.Computed
+		local OnEvent = Classes.OnEvent
+
+		local sets = {}
+		local setsToSave = {}
+
+		local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+		local mouse = plugin:GetMouse()
+
+		local outQuick = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+		local function Tween(instance, tweenInfo, goal)
+			local tween = TweenService:Create(instance, tweenInfo, goal)
+			tween:Play()
+
+			return tween
+		end
+
+		local function hover(add)
+			add.MouseEnter:Connect(function()
+				if not config.Locked:get() then
+					mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+					Tween(add, outQuick, { BackgroundColor3 = config.Accent:get() })
+				end
+			end)
+
+			add.MouseLeave:Connect(function()
+				if not config.Locked:get() then
+					mouse.Icon = "rbxasset://SystemCursors/Arrow"
+				end
+
+				Tween(add, outQuick, { BackgroundColor3 = config.DefaultColor:get() })
+			end)
+
+			add.MouseButton1Down:Connect(function()
+				if config.Locked:get() then return end
+
+				local effect = New "ImageLabel" {
+					Parent = add,
+					Size = UDim2.fromScale(1, 1),
+					AnchorPoint = Vector2.new(0.5, 0.5),
+					Position = UDim2.fromScale(0.5, 0.5),
+
+					BackgroundColor3 = config.Accent:get(),
+
+					Image = "",
+					ImageTransparency = 1,
+					BackgroundTransparency = 0.5,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				}
+
+				local object = Tween(effect, outQuick, { Size = UDim2.new(1, 27, 1, 15), BackgroundTransparency = 1 })
+				object.Completed:Wait()
+				effect:Destroy()
+			end)
+		end
+
+		local function setupSet(data, parent)
+			local set = data.set
+
+			hover(set.Convert)
+			hover(set.Class)
+
+			local function apply()
+				if config.Locked:get() then return end
+
+				dialog:open("Convert To", { ["Name"] = setsToSave[set.LayoutOrder].to }, nil, UDim2.fromOffset(200, 43))
+				local input = dialog:completed()
+
+				if input then
+					local valid = pcall(function()
+						local p = Instance.new(input.Name)
+						p:Destroy()
+					end)
+
+					if valid then
+						set.Class.Text = input.Name
+						setsToSave[set.LayoutOrder].to = input.Name
+
+						DataManager.data.Conversions = setsToSave
+						DataManager.save()
+					end
+				end
+			end
+
+			set.Class.MouseButton1Down:Connect(apply)
+			set.Convert.MouseButton1Down:Connect(function()
+				if config.Locked:get() then return end
+
+				local currentSelection = Selection:Get()
+				local finalSelection
+
+				for index, selected in ipairs(currentSelection) do
+					if not finalSelection then
+						finalSelection = {}
+					end
+
+					local instance = ClassManager.convert(selected, setsToSave[set.LayoutOrder].to)
+					table.insert(finalSelection, instance)
+				end
+
+				if finalSelection then
+					Selection:Set(finalSelection)
+				end
+
+				ChangeHistoryService:SetWaypoint("Conversion")
+			end)
+
+			set.Delete.MouseButton1Down:Connect(function()
+				if not config.Locked:get() then
+					if #parent:GetChildren() == 5 then
+						table.clear(sets)
+						table.clear(setsToSave)
+
+						parent.Parent.Size = UDim2.new(1, 0, 0, 66)
+					else
+						table.remove(sets, set.LayoutOrder)
+						table.remove(setsToSave, set.LayoutOrder)
+
+						parent.Parent.Size = UDim2.new(1, 0, 0, parent.Parent.Size.Y.Offset - 51)
+					end
+
+					for index, set in ipairs(sets) do
+						set.LayoutOrder = index
+					end
+
+					DataManager.data.Conversions = setsToSave
+					DataManager.save()
+
+					set:Destroy()
+				end
+			end)
+
+			tooltip(set.Delete, "Delete", widget)
+		end
+
+		local function createSet(data)
+			setsToSave[#setsToSave + 1] = {
+				to = data.to
+			}
+
+			local set = New "Frame" {
+				Name = "ConversionSet",
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				BackgroundTransparency = 1,
+				BorderSizePixel = 0,
+				LayoutOrder = #setsToSave,
+				Size = UDim2.fromOffset(100, 100),
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "ImageButton" {
+						Name = "Delete",
+						AnchorPoint = Vector2.new(1, 0.5),
+						BackgroundTransparency = 1,
+						Position = UDim2.new(1, 5, 0.5, 0),
+						Size = UDim2.fromOffset(36, 36),
+						Image = "rbxassetid://9906861600",
+						ImageColor3 = Color3.fromRGB(255, 51, 51),
+
+						[OnEvent "MouseEnter"] = function()
+							if config.Locked:get() then return end
+							mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+						end,
+
+						[OnEvent "MouseLeave"] = function()
+							mouse.Icon = "rbxasset://SystemCursors/Arrow"
+						end,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							}
+						}
+					},
+
+					New "TextButton" {
+						Name = "Convert",
+						AnchorPoint = Vector2.new(1, 0),
+
+						BackgroundColor3 = Computed(function()
+							return config.DefaultColor
+						end),
+
+						BorderColor3 = Color3.new(),
+						BorderSizePixel = 0,
+						Position = UDim2.new(1, -38, 0, 0),
+						Size = UDim2.new(0, 63, 1, 0),
+						AutoButtonColor = false,
+						Font = Enum.Font.Gotham,
+						Text = "Convert",
+
+						TextColor3 = Computed(function()
+							return config.TextColor
+						end),
+
+						TextSize = 13,
+						TextWrapped = true,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							},
+
+							New "UIPadding" {
+								PaddingLeft = UDim.new(0, 6),
+								PaddingRight = UDim.new(0, 6)
+							}
+						}
+					},
+
+					New "TextButton" {
+						Name = "Class",
+
+						BackgroundColor3 = Computed(function()
+							return config.DefaultColor
+						end),
+
+						BorderColor3 = Color3.new(),
+						BorderSizePixel = 0,
+						Size = UDim2.new(1, -112, 1, 0),
+						AutoButtonColor = false,
+						Font = Enum.Font.Gotham,
+						Text = data.to,
+
+						TextColor3 = Computed(function()
+							return config.TextColor
+						end),
+
+						TextSize = 13,
+						TextWrapped = true,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							},
+
+							New "UIPadding" {
+								PaddingLeft = UDim.new(0, 6),
+								PaddingRight = UDim.new(0, 6)
+							}
+						}
+					}
+				}
+			}
+
+			tooltip(set.Class, "Class", widget)
+			table.insert(sets, set)
+			return set
+		end
+
+		local add = New "Frame" {
+			Name = "Add",
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			Size = UDim2.fromOffset(100, 100),
+
+			[Children] = {
+				New "TextButton" {
+					Name = "New",
+
+					BackgroundColor3 = Computed(function()
+						return config.DefaultColor
+					end),
+
+					Size = UDim2.fromScale(1, 1),
+					AutoButtonColor = false,
+					Font = Enum.Font.Gotham,
+					Text = "Add conversion set",
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 13,
+					TextWrapped = true,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "UIPadding" {
+							PaddingLeft = UDim.new(0, 6),
+							PaddingRight = UDim.new(0, 6)
+						}
+					}
+				}
+			}
+		}
+
+		hover(add.New)
+
+		add.Parent = parent
+		add.New.MouseButton1Down:Connect(function()
+			if config.Locked:get() then return end
+
+			parent.Parent.Size = UDim2.new(1, 0, 0, 66 + (#sets + 1) * 51)
+
+			local set = createSet({ to = "Frame" })
+			set.Parent = parent
+
+			setupSet({ set = set, to = "Frame" }, parent)
+
+			DataManager.data.Conversions = setsToSave
+			DataManager.save()
+		end)
+
+		for index, data in ipairs(dataset) do
+			local set = createSet(data)
+			set.Parent = parent
+
+			setupSet({
+				set = set,
+				to = data.to
+			}, parent)
+		end
+
+		parent.Parent.Size = UDim2.new(1, 0, 0, 66 + (#sets) * 51)
+	end
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX937C84CD57B24BF98335929CFA80A0E3">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Colors</string>
+						<string name="ScriptGuid">{A82BCC5A-3031-46D8-B903-45F3A66D7157}</string>
+						<ProtectedString name="Source"><![CDATA[return function(dataset, parent, widget)
+	local main = _G.UIToolsMain
+
+	local Classes = main:getModule("Classes")
+	local colorDialog = main:getModule("ColorDialog")
+	local dialog = main:getModule("InputDialog")
+	local config = main:getModule("Settings")()
+	local DataManager = main:getModule("DataManager")
+	local tooltip = main:getModule("Tooltip")
+
+	local TweenService = game:GetService("TweenService")
+	local Selection = game:GetService("Selection")
+	local ChangeHistoryService = game:GetService("ChangeHistoryService")
+	local CollectionService = game:GetService("CollectionService")
+
+	local New = Classes.New
+	local Children = Classes.Children
+	local Computed = Classes.Computed
+	local OnEvent = Classes.OnEvent
+
+	local sets = {}
+	local setsToSave = {}
+
+	local propertyTypes = {
+		["Color"] = "Color",
+		["BackgroundColor3"] = "Background",
+		["TextColor3"] = "Text",
+		["TextStrokeColor3"] = "Stroke",
+		["BorderColor3"] = "Border",
+		["ImageColor3"] = "Image",
+		["Color3"] = "Color3",
+		["VertexColor"] = "Vertex",
+		["SurfaceColor3"] = "Surface",
+		["Ambient"] = "Ambient",
+		["ColorShift_Bottom"] = "ShiftBotton",
+		["ColorShift_Top"] = "ShiftTop",
+		["OutdoorAmbient"] = "OutdoorAmbient",
+		["FillColor"] = "Fill",
+		["OutlineColor"] = "Outline",
+		["SparkleColor"] = "Sparkles",
+		["TeamColor"] = "Team",
+		["Decay"] = "Decay",
+		["TintColor"] = "Tint",
+		["HeadColor3"] = "Head",
+		["LeftArmColor3"] = "Left Arm",
+		["LeftLegColor"] = "Left Leg",
+		["RightArmColor3"] = "Right Arm",
+		["RightLegColor3"] = "Right Leg",
+		["TorsoColor3"] = "Torso",
+		["GroupColor3"] = "Group"
+	}
+
+	local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+	local mouse = plugin:GetMouse()
+
+	local outQuick = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local function Tween(instance, tweenInfo, goal)
+		local tween = TweenService:Create(instance, tweenInfo, goal)
+		tween:Play()
+
+		return tween
+	end
+
+	local function checkProperty(instance, name)
+		local success = pcall(function()
+			local prop = instance[name]
+		end)
+
+		return success
+	end
+
+	local function getColorFromString(str)
+		return Color3.new(table.unpack(string.split(str, ", ")))
+	end
+
+	local function getStringFromColor(color)
+		return tostring(color)
+	end
+
+	local function hover(add)
+		add.MouseEnter:Connect(function()
+			if not config.Locked:get() then
+				mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+				Tween(add, outQuick, { BackgroundColor3 = config.Accent:get() })
+			end
+		end)
+
+		add.MouseLeave:Connect(function()
+			if not config.Locked:get() then
+				mouse.Icon = "rbxasset://SystemCursors/Arrow"
+			end
+
+			Tween(add, outQuick, { BackgroundColor3 = config.DefaultColor:get() })
+		end)
+
+		add.MouseButton1Down:Connect(function()
+			if config.Locked:get() then return end
+
+			local effect = New "ImageLabel" {
+				Parent = add,
+				Size = UDim2.fromScale(1, 1),
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromScale(0.5, 0.5),
+
+				BackgroundColor3 = config.Accent:get(),
+
+				Image = "",
+				ImageTransparency = 1,
+				BackgroundTransparency = 0.5,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					}
+				}
+			}
+
+			local object = Tween(effect, outQuick, { Size = UDim2.new(1, 27, 1, 15), BackgroundTransparency = 1 })
+			object.Completed:Wait()
+			effect:Destroy()
+		end)
+	end
+
+	local function setupSet(data, parent)
+		local set = data.set
+
+		hover(set.Apply)
+		hover(set.PropertyType)
+		tooltip(set.PropertyType, "Property type", widget)
+
+		set.Color.MouseButton1Down:Connect(function()
+			if config.Locked:get() or colorDialog._dialog then return end
+
+			colorDialog:open(set.Color.BackgroundColor3)
+			local color = colorDialog:completed()
+
+			if color then
+				set.Color.BackgroundColor3 = color
+				setsToSave[set.LayoutOrder].color = getStringFromColor(color)
+
+				DataManager.data.Sets = setsToSave
+				DataManager.save()
+			end
+		end)
+
+		set.PropertyType.MouseButton1Down:Connect(function()
+			if config.Locked:get() then return end
+
+			dialog:open("Property Type", { ["Name"] = setsToSave[set.LayoutOrder].property }, nil, UDim2.fromOffset(200, 43))
+			local input = dialog:completed()
+
+			if input then
+				if propertyTypes[input["Name"]] then
+					set.PropertyType.Text = propertyTypes[input["Name"]]
+					setsToSave[set.LayoutOrder].property = input["Name"]
+
+					DataManager.data.Sets = setsToSave
+					DataManager.save()
+				end
+			end
+		end)
+
+		set.Apply.MouseButton1Down:Connect(function()
+			if config.Locked:get() then return end
+
+			local currentSelection = Selection:Get()
+			local finalSelection
+
+			for index, selected in ipairs(currentSelection) do
+				pcall(function()
+					local property = setsToSave[set.LayoutOrder].property
+					local itemParent = selected.Parent
+					local singleItem = selected:Clone()
+					singleItem:ClearAllChildren()
+
+					if checkProperty(singleItem, property) then
+						if not finalSelection then
+							finalSelection = {}
+						end
+
+						local children = {}
+
+						for index, child in ipairs(selected:GetDescendants()) do
+							table.insert(children, child:Clone())
+						end
+
+						if property == "VertexColor" then
+							local r, g, b = set.Color.BackgroundColor3.R, set.Color.BackgroundColor3.G, set.Color.BackgroundColor3.B
+							singleItem[property] = Vector3.new(r, g, b)
+						elseif typeof(singleItem[property]) == "ColorSequence" then
+							singleItem[property] = ColorSequence.new({
+								ColorSequenceKeypoint.new(0, set.Color.BackgroundColor3)
+							})
+						else
+							singleItem[property] = set.Color.BackgroundColor3
+						end
+
+						for name, value in pairs(selected:GetAttributes()) do
+							singleItem:SetAttribute(name, value)
+						end
+
+						for _, tag in pairs(CollectionService:GetTags(selected)) do
+							CollectionService:AddTag(singleItem, tag)
+						end
+
+						for index, child in ipairs(children) do
+							child.Parent = singleItem
+						end
+
+						selected:Remove()
+						singleItem.Parent = itemParent
+
+						table.insert(finalSelection, singleItem)
+						table.clear(children)
+
+						ChangeHistoryService:SetWaypoint("Used a color set")
+					end
+				end)
+			end
+
+			if finalSelection then
+				Selection:Set(finalSelection)
+			end
+		end)
+
+		set.Delete.MouseButton1Down:Connect(function()
+			if not config.Locked:get() then
+				if #parent:GetChildren() == 5 then
+					table.clear(sets)
+					table.clear(setsToSave)
+
+					parent.Parent.Size = UDim2.new(1, 0, 0, 66)
+				else
+					table.remove(sets, set.LayoutOrder)
+					table.remove(setsToSave, set.LayoutOrder)
+
+					parent.Parent.Size = UDim2.new(1, 0, 0, parent.Parent.Size.Y.Offset - 51)
+				end
+
+				for index, set in ipairs(sets) do
+					print(index)
+					set.LayoutOrder = index
+				end
+
+				DataManager.data.Sets = setsToSave
+				DataManager.save()
+
+				set:Destroy()
+			end
+		end)
+
+		tooltip(set.Delete, "Delete", widget)
+	end
+
+	local function createSet(data)
+		setsToSave[#setsToSave + 1] = {
+			property = data.property,
+			color = data.color
+		}
+
+		local set = New "Frame" {
+			Name = "ColorSet",
+			BackgroundColor3 = Color3.new(1, 1, 1),
+			BackgroundTransparency = 1,
+			BorderSizePixel = 0,
+			LayoutOrder = #setsToSave,
+			Size = UDim2.fromOffset(100, 100),
+
+			[Children] = {
+				New "UICorner" {
+					CornerRadius = UDim.new(0, 6)
+				},
+
+				New "ImageButton" {
+					Name = "Color",
+					BackgroundColor3 = getColorFromString(data.color),
+					Size = UDim2.fromOffset(36, 36),
+					AutoButtonColor = false,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						}
+					},
+
+					[OnEvent "MouseEnter"] = function()
+						if config.Locked:get() then return end
+						mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+					end,
+
+					[OnEvent "MouseLeave"] = function()
+						mouse.Icon = "rbxasset://SystemCursors/Arrow"
+					end
+				},
+
+				New "TextButton" {
+					Name = "PropertyType",
+
+					BackgroundColor3 = Computed(function()
+						return config.DefaultColor
+					end),
+
+					BorderColor3 = Color3.new(),
+					BorderSizePixel = 0,
+					Position = UDim2.fromOffset(46, 0),
+					Size = UDim2.new(1, -144, 1, 0),
+					AutoButtonColor = false,
+					Font = Enum.Font.Gotham,
+					Text = propertyTypes[data.property],
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 13,
+					TextWrapped = true,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "UIPadding" {
+							PaddingLeft = UDim.new(0, 6),
+							PaddingRight = UDim.new(0, 6)
+						}
+					}
+				},
+
+				New "ImageButton" {
+					Name = "Delete",
+					AnchorPoint = Vector2.new(1, 0.5),
+					BackgroundTransparency = 1,
+					Position = UDim2.new(1, 5, 0.5, 0),
+					Size = UDim2.fromOffset(36, 36),
+					Image = "rbxassetid://9906861600",
+					ImageColor3 = Color3.fromRGB(255, 51, 51),
+
+					[OnEvent "MouseEnter"] = function()
+						if config.Locked:get() then return end
+						mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+					end,
+
+					[OnEvent "MouseLeave"] = function()
+						mouse.Icon = "rbxasset://SystemCursors/Arrow"
+					end,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						}
+					}
+				},
+
+				New "TextButton" {
+					Name = "Apply",
+					AnchorPoint = Vector2.new(1, 0),
+
+					BackgroundColor3 = Computed(function()
+						return config.DefaultColor
+					end),
+
+					BorderColor3 = Color3.new(),
+					BorderSizePixel = 0,
+					Position = UDim2.new(1, -38, 0, 0),
+					Size = UDim2.new(0, 50, 1, 0),
+					AutoButtonColor = false,
+					Font = Enum.Font.Gotham,
+					Text = "Apply",
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					TextSize = 13,
+					TextWrapped = true,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "UIPadding" {
+							PaddingLeft = UDim.new(0, 6),
+							PaddingRight = UDim.new(0, 6)
+						}
+					}
+				}
+			}
+		}
+
+		tooltip(set.Color, "Color", widget)
+		table.insert(sets, set)
+		return set
+	end
+
+	local add = New "Frame" {
+		Name = "Add",
+		BackgroundColor3 = Color3.new(1, 1, 1),
+		BackgroundTransparency = 1,
+		BorderSizePixel = 0,
+		Size = UDim2.fromOffset(100, 100),
+
+		[Children] = {
+			New "TextButton" {
+				Name = "New",
+
+				BackgroundColor3 = Computed(function()
+					return config.DefaultColor
+				end),
+
+				BorderColor3 = Color3.new(),
+				BorderSizePixel = 0,
+				Size = UDim2.fromScale(1, 1),
+				AutoButtonColor = false,
+				Font = Enum.Font.Gotham,
+				Text = "Add color set",
+
+				TextColor3 = Computed(function()
+					return config.TextColor
+				end),
+
+				TextSize = 13,
+				TextWrapped = true,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "UIPadding" {
+						PaddingLeft = UDim.new(0, 6),
+						PaddingRight = UDim.new(0, 6)
+					}
+				}
+			}
+		}
+	}
+
+	hover(add.New)
+
+	add.Parent = parent
+	add.New.MouseButton1Down:Connect(function()
+		if config.Locked:get() then return end
+
+		parent.Parent.Size = UDim2.new(1, 0, 0, 66 + (#sets + 1) * 51)
+
+		local set = createSet({ property = "BackgroundColor3", color = "1, 1, 1" })
+		set.Parent = parent
+
+		setupSet({
+			set = set,
+			property = "BackgroundColor3"
+		}, parent)
+
+		DataManager.data.Sets = setsToSave
+		DataManager.save()
+	end)
+
+	for index, data in ipairs(dataset) do
+		local set = createSet(data)
+		set.Parent = parent
+
+		setupSet({
+			set = set,
+			property = data.property
+		}, parent)
+	end
+
+	parent.Parent.Size = UDim2.new(1, 0, 0, 66 + (#sets) * 51)
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="ModuleScript" referent="RBX27AD578F6377447DBC308F71DFF233B7">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Theme</string>
+					<string name="ScriptGuid">{73D209C0-EBBB-49DA-B998-7039CA2A1000}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local studio = settings().Studio
+local config = main:getModule("Settings")()
+
+local function onThemeChanged()
+	if studio.Theme.Name == "Dark" then
+		config.DefaultColor:set(Color3.fromRGB(45, 45, 45))
+		config.ContainerBackgroundColor:set(Color3.fromRGB(33, 33, 33))
+		config.ContainerTopColor:set(Color3.fromRGB(26, 26, 26))
+		config.TextColor:set(Color3.fromRGB(255, 255, 255))
+		config.TooltipColor:set(Color3.fromRGB(30, 30, 30))
+	elseif studio.Theme.Name == "Light" then
+		config.DefaultColor:set(Color3.fromRGB(255, 255, 255))
+		config.ContainerBackgroundColor:set(Color3.fromRGB(234, 234, 234))
+		config.ContainerTopColor:set(Color3.fromRGB(244, 244, 244))
+		config.TextColor:set(Color3.fromRGB(0, 0, 0))
+		config.TooltipColor:set(Color3.fromRGB(225, 225, 225))
+	end
+end
+
+studio.ThemeChanged:Connect(onThemeChanged)
+
+return onThemeChanged]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX34941BF8920B491B8C71D5591B112315">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Extensions</string>
+					<string name="ScriptGuid">{13D89248-FFE8-4212-ADC7-0C9B18E6E52C}</string>
+					<ProtectedString name="Source"><![CDATA[local extensions = {}
+
+function extensions.activate(name)
+	local module = script:FindFirstChild(name)
+
+	if module then
+		require(module)()
+	end
+end
+
+return extensions]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBX5FD30F79B2EA43019393C5B5DF378E92">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Select</string>
+						<string name="ScriptGuid">{1EF44712-2A9D-4EFC-99F0-20AA3C9A0D69}</string>
+						<ProtectedString name="Source"><![CDATA[-- allows to select gui objects while holding the left control button
+-- then abuses the fact that you can select gui objects if you are already selecting one lol
+
+return function()
+	local UserInputService = game:GetService("UserInputService")
+	local StarterGui = game:GetService("StarterGui")
+	local Selection = game:GetService("Selection")
+
+	UserInputService.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 and UserInputService:IsKeyDown("LeftControl") then
+			local current = Selection:Get()
+			local pass = true
+
+			for _, obj in ipairs(current) do
+				if obj:IsA("GuiBase2d") then
+					pass = false
+				end
+			end
+
+			if pass then
+				local pos = UserInputService:GetMouseLocation()
+				local objects = StarterGui:GetGuiObjectsAtPosition(pos.X, pos.Y)
+
+				if #objects > 0 then
+					table.insert(current, objects[1])
+					Selection:Set(current)
+				end
+			end
+		end
+	end)
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+		</Item>
+		<Item class="Folder" referent="RBX1410DDC9DF994D18BD6195670254D65D">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<string name="Name">Utility</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+			<Item class="ModuleScript" referent="RBXBBC3ADF15ACE4C13BAF5485C338D88DE">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">InputDialog</string>
+					<string name="ScriptGuid">{76531C60-9562-4909-981E-5C33A3725B13}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local Classes = main:getModule("Classes")
+local config = main:getModule("Settings")()
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local New = Classes.New
+local Children = Classes.Children
+local Computed = Classes.Computed
+local OnEvent = Classes.OnEvent
+
+local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
+local outQuick = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+local module = {}
+local dialog = {}
+local methods = {}
+methods.__index = methods
+
+local function Tween(instance, tweenInfo, goal)
+	local tween = TweenService:Create(instance, tweenInfo, goal)
+	tween:Play()
+
+	return tween
+end
+
+local function checkProperty(instance, name)
+	local newInstance = instance:Clone()
+	newInstance:ClearAllChildren()
+
+	local success = pcall(function()
+		return newInstance[name]
+	end)
+
+	return success
+end
+
+function module.new()
+	local self = setmetatable(dialog, methods)
+
+	self._dialog = nil
+	self._yield = false
+	self._focused = 1
+	self._inputs = {}
+	self._values = {}
+	self._connections = {}
+
+	return self
+end
+
+function methods:createDialog(mainWidget) -- (one time only)
+	local widget = New "Frame" {
+		Name = "Dialog",
+		Parent = mainWidget.Main,
+
+		Visible = false,
+
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		ZIndex = 10,
+
+		Size = UDim2.fromOffset(230, 140),
+		Position = UDim2.new(0.5, 0, 0.5, -20),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+
+		BackgroundColor3 = Computed(function()
+			return config.DefaultColor
+		end),
+
+		[Children] = {
+			New "UICorner" {
+				CornerRadius = UDim.new(0, 6)
+			}
+		}
+	}
+
+	New "Frame" {
+		Name = "Fields",
+		Parent = widget,
+		BackgroundTransparency = 1,
+
+		Size = UDim2.fromScale(2, 0.45),
+		Position = UDim2.fromScale(0.5, 0.43),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+
+		ZIndex = 11,
+
+		[Children] = {
+			New "UIGridLayout" {
+				CellPadding = UDim2.fromOffset(8, 8),
+				CellSize = UDim2.fromOffset(35, 43),
+				HorizontalAlignment = Enum.HorizontalAlignment.Center,
+				VerticalAlignment = Enum.VerticalAlignment.Center,
+				SortOrder = Enum.SortOrder.LayoutOrder
+			}
+		}
+	}
+
+	New "TextLabel" {
+		Parent = widget,
+		Name = "Title",
+		Text = "Title",
+
+		Font = Enum.Font.GothamSemibold,
+		TextXAlignment = Enum.TextXAlignment.Left,
+
+		TextSize = 16,
+		BorderSizePixel = 0,
+
+		ZIndex = 11,
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end),
+
+		Size = UDim2.fromOffset(0, 16),
+		Position = UDim2.fromOffset(8, 8),
+		BackgroundTransparency = 1,
+		TextTransparency = 1,
+	}
+
+	local done = New "TextButton" {
+		Parent = widget,
+		Name = "Done",
+		Text = "Done",
+		Font = Enum.Font.Gotham,
+
+		ZIndex = 11,
+
+		TextSize = 13,
+		BorderSizePixel = 0,
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end),
+
+		Size = UDim2.new(0.5, -12, 0, 30),
+		Position = UDim2.new(0, 8, 1, -8),
+		AnchorPoint = Vector2.new(0, 1),
+		BackgroundTransparency = 1,
+		TextTransparency = 1,
+		AutoButtonColor = false,
+
+		BackgroundColor3 = Computed(function()
+			return config.Accent
+		end),
+
+		[Children] = {
+			New "UICorner" {
+				CornerRadius = UDim.new(0, 6)
+			},
+
+			New "UIPadding" {
+				PaddingLeft = UDim.new(0, 6),
+				PaddingRight = UDim.new(0, 6)
+			}
+		}
+	}
+
+	local cancel = New "TextButton" {
+		Parent = widget,
+		Name = "Cancel",
+		Text = "Cancel",
+		Font = Enum.Font.Gotham,
+
+		TextSize = 13,
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		TextTransparency = 1,
+		AutoButtonColor = false,
+
+		ZIndex = 11,
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end),
+
+		Size = UDim2.new(0.5, -12, 0, 30),
+		Position = UDim2.new(1, -8, 1, -8),
+		AnchorPoint = Vector2.new(1, 1),
+
+		BackgroundColor3 = Computed(function()
+			return config.ContainerBackgroundColor
+		end),
+
+		[Children] = {
+			New "UICorner" {
+				CornerRadius = UDim.new(0, 6)
+			},
+
+			New "UIPadding" {
+				PaddingLeft = UDim.new(0, 6),
+				PaddingRight = UDim.new(0, 6)
+			}
+		}
+	}
+
+	self.widget = widget
+end
+
+function dialog:open(name, fields, customPadding, customCellSize, customSorting) -- <fields> : table { "FieldName" = value } - up to 5 <customPadding> : UDim2 (optional) <customCellSize> : UDim2 (optional) : <customSorting> : table (optional)
+	if self._dialog then return end
+
+	self._dialog = true
+	self._yield = true
+
+	config.Locked:set(true)
+
+	self.widget.Fields.UIGridLayout.CellPadding = customPadding or UDim2.fromOffset(8, 8)
+	self.widget.Fields.UIGridLayout.CellSize = customCellSize or UDim2.fromOffset(35, 43)
+
+	self.widget.Title.Text = name
+	self.widget.Visible = true
+
+	local mouse = plugin:GetMouse()
+
+	Tween(self.widget, outQuick, { Position = UDim2.fromScale(0.5, 0.5), BackgroundTransparency = 0 })
+	Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 0.5 })
+
+	local index = 0
+	local data = {}
+
+	for name, value in pairs(fields) do
+		if customSorting then
+			data[table.find(customSorting, name)] = { name, value }
+		else
+			table.insert(data, { name, value })
+		end
+	end
+
+	for _, data in pairs(data) do
+		local name, value = data[1], data[2]
+		index += 1
+
+		local inputField = New "Frame" {
+			Name = name,
+			Parent = self.widget.Fields,
+			BackgroundTransparency = 1,
+
+			[Children] = {
+				New "TextLabel" {
+					Name = "Title",
+					Text = name,
+
+					Font = Enum.Font.GothamSemibold,
+
+					TextSize = 13,
+					BorderSizePixel = 0,
+					Position = UDim2.fromOffset(0, -3),
+
+					ZIndex = 11,
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					Size = UDim2.new(1, 0, 0, 13),
+					BackgroundTransparency = 1,
+					TextTransparency = 1
+				},
+
+				New "TextBox" {
+					Name = "Input",
+					Text = value,
+
+					Font = Enum.Font.Gotham,
+
+					TextSize = 13,
+					BorderSizePixel = 0,
+					BackgroundTransparency = 1,
+					TextTransparency = 1,
+
+					ZIndex = 11,
+
+					ClearTextOnFocus = false,
+					TextWrapped = true,
+
+					TextColor3 = Computed(function()
+						return config.TextColor
+					end),
+
+					Size = UDim2.new(1, 0, 0, 30),
+					Position = UDim2.fromOffset(0, 16),
+
+					BackgroundColor3 = Computed(function()
+						return config.ContainerBackgroundColor
+					end),
+
+					[OnEvent "MouseEnter"] = function()
+						mouse.Icon = "rbxasset://SystemCursors/IBeam"
+					end,
+
+					[OnEvent "MouseLeave"] = function()
+						mouse.Icon = "rbxasset://SystemCursors/Arrow"
+					end,
+
+					[Children] = {
+						New "UICorner" {
+							CornerRadius = UDim.new(0, 6)
+						},
+
+						New "UIPadding" {
+							PaddingLeft = UDim.new(0, 6),
+							PaddingRight = UDim.new(0, 6)
+						},
+
+						New "UIStroke" {
+							ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+							Color = config.Accent:get(),
+							Thickness = 1.6,
+							Transparency = 1
+						}
+					}
+				}
+			}
+		}
+
+		local localIndex = index
+
+		table.insert(self._inputs, inputField)
+
+		-- me when roblox doesn't add a normal keyboard input system:
+		self._connections[inputField.Name] = inputField.Input:GetPropertyChangedSignal("Text"):Connect(function()
+			if inputField.Input.Text:match("\t") then
+				inputField.Input.Text = inputField.Input.Text:gsub("\t", "")
+				self._inputs[self._focused].Input:ReleaseFocus()
+				self._focused += 1
+
+				if self._focused > #self._inputs then
+					self._focused = 1
+				end
+
+				self._inputs[self._focused].Input:CaptureFocus()
+			end
+		end)
+
+		self._connections[inputField.Name .. "Input"] = inputField.Input.FocusLost:Connect(function(enter)
+			Tween(inputField.Input.UIStroke, outQuick, { Transparency = 1 })
+
+			if enter then
+				local gathered = {}
+				for index, field in ipairs(self.widget.Fields:GetChildren()) do
+					if field:FindFirstChild("Input") then
+						local number = tonumber(field.Input.Text) or field.Input.Text
+						gathered[field.Name] = number
+					end
+				end
+
+				self._values = gathered
+				self._yield = false
+
+				config.Locked:set(false)
+
+				local mainTween = Tween(self.widget, outQuick, { Position = UDim2.new(0.5, 0, 0.5, -20), BackgroundTransparency = 1 })
+				Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+
+				for index, element in ipairs(self.widget:GetDescendants()) do
+					if checkProperty(element, "BackgroundTransparency") then
+						Tween(element, outQuick, { BackgroundTransparency = 1 })
+					end
+
+					if checkProperty(element, "TextTransparency") then
+						Tween(element, outQuick, { TextTransparency = 1 })
+					end
+				end
+
+				for index, connection in pairs(self._connections) do
+					connection:Disconnect()
+				end
+
+				self._focused = 1
+				self._inputs = {}
+
+				mainTween.Completed:Wait()
+
+				self.widget.Visible = false
+
+				for index, field in ipairs(self.widget.Fields:GetChildren()) do
+					if field:IsA("Frame") then
+						field:Destroy()
+					end
+				end
+
+				self._dialog = false
+			end
+		end)
+
+		self._connections[inputField.Name .. "Input"] = inputField.Input.Focused:Connect(function()
+			self._focused = localIndex
+			Tween(inputField.Input.UIStroke, outQuick, { Transparency = 0 })
+		end)
+	end
+
+	self._inputs[1].Input:CaptureFocus()
+	Tween(self._inputs[1].Input.UIStroke, outQuick, { Transparency = 0 })
+
+	for index, element in ipairs(self.widget:GetDescendants()) do
+		if checkProperty(element, "BackgroundTransparency") and element.Name ~= "Title" and element.Name ~= "Fields" and element.Parent.Name ~= "Fields" then
+			Tween(element, outQuick, { BackgroundTransparency = 0 })
+		end
+
+		if checkProperty(element, "TextTransparency") then
+			Tween(element, outQuick, { TextTransparency = 0 })
+		end
+	end
+
+	self._connections["done"] = self.widget.Done.MouseButton1Click:Connect(function()
+		local gathered = {}
+		for index, field in ipairs(self.widget.Fields:GetChildren()) do
+			if field:FindFirstChild("Input") then
+				local number = tonumber(field.Input.Text) or field.Input.Text
+				gathered[field.Name] = number
+			end
+		end
+
+		self._values = gathered
+		self._yield = false
+
+		config.Locked:set(false)
+
+		local mainTween = Tween(self.widget, outQuick, { Position = UDim2.new(0.5, 0, 0.5, -20), BackgroundTransparency = 1 })
+		Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+
+		for index, element in ipairs(self.widget:GetDescendants()) do
+			if checkProperty(element, "BackgroundTransparency") then
+				Tween(element, outQuick, { BackgroundTransparency = 1 })
+			end
+
+			if checkProperty(element, "TextTransparency") then
+				Tween(element, outQuick, { TextTransparency = 1 })
+			end
+		end
+
+		for index, connection in pairs(self._connections) do
+			connection:Disconnect()
+		end
+
+		self._focused = 1
+		self._inputs = {}
+
+		mainTween.Completed:Wait()
+
+		self.widget.Visible = false
+
+		for index, field in ipairs(self.widget.Fields:GetChildren()) do
+			if field:IsA("Frame") then
+				field:Destroy()
+			end
+		end
+
+		self._dialog = false
+	end)
+
+	self._connections["cancel"] = self.widget.Cancel.MouseButton1Click:Connect(function()
+		self._values = nil
+		self._yield = false
+
+		config.Locked:set(false)
+
+		local mainTween = Tween(self.widget, outQuick, { Position = UDim2.new(0.5, 0, 0.5, -20), BackgroundTransparency = 1 })
+		Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+
+		for index, element in ipairs(self.widget:GetDescendants()) do
+			if checkProperty(element, "BackgroundTransparency") and element.Name ~= "Title" and element.Name ~= "Fields" and element.Parent.Name ~= "Fields" then
+				Tween(element, outQuick, { BackgroundTransparency = 1 })
+			end
+
+			if checkProperty(element, "TextTransparency") then
+				Tween(element, outQuick, { TextTransparency = 1 })
+			end
+		end
+
+		for index, connection in pairs(self._connections) do
+			connection:Disconnect()
+		end
+
+		self._focused = 1
+		self._inputs = {}
+
+		mainTween.Completed:Wait()
+
+		self.widget.Visible = false
+
+		for index, field in ipairs(self.widget.Fields:GetChildren()) do
+			if field:IsA("Frame") then
+				field:Destroy()
+			end
+		end
+
+		self._dialog = false
+	end)
+
+	self._connections["doneHover"] = self.widget.Done.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+
+	self._connections["doneUnHover"] = self.widget.Done.MouseLeave:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/Arrow"
+	end)
+
+	self._connections["cancelHover"] = self.widget.Cancel.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+
+	self._connections["cancelUnHover"] = self.widget.Cancel.MouseLeave:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/Arrow"
+	end)
+end
+
+function dialog:completed()
+	repeat
+		task.wait()
+	until self._yield == false
+
+	local values = self._values
+	self._values = nil
+
+	return values
+end
+
+return module.new()]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX5CB6D897FCD14C93ADC0896C3A8A894A">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">ColorDialog</string>
+					<string name="ScriptGuid">{4F17534E-D479-4D54-B91C-EEC4BE5FD4C0}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local Classes = main:getModule("Classes")
+local config = main:getModule("Settings")()
+local DataManager = main:getModule("DataManager")
+
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+local New = Classes.New
+local Children = Classes.Children
+local Computed = Classes.Computed
+local OnEvent = Classes.OnEvent
+
+local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+local outQuick = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+local module = {}
+local dialog = {}
+local methods = {}
+
+local dataTypes = DataManager.dataTypes
+methods.__index = methods
+
+local function Tween(instance, tweenInfo, goal)
+	local tween = TweenService:Create(instance, tweenInfo, goal)
+	tween:Play()
+
+	return tween
+end
+
+local function checkProperty(instance, name)
+	local newInstance = instance:Clone()
+	newInstance:ClearAllChildren()
+
+	local success = pcall(function()
+		return newInstance[name]
+	end)
+
+	return success
+end
+
+function module.new()
+	local self = setmetatable(dialog, methods)
+
+	self._dialog = nil
+	self._yield = false
+	self._cancelled = false
+
+	self.hue = 0
+	self.sat = 1
+	self.value = 1
+
+	self._connections = {}
+
+	return self
+end
+
+function methods:createDialog(mainWidget) -- (one time only)
+	local widget = New "Frame" {
+		Name = "ColorDialog",
+		Parent = mainWidget.Main,
+		AnchorPoint = Vector2.new(0.5, 0.5),
+		ZIndex = 10,
+		Visible = false,
+
+		BackgroundColor3 = Computed(function()
+			return config.DefaultColor
+		end),
+
+		Position = UDim2.new(0.5, 0, 0.5, -20),
+		Size = UDim2.fromOffset(250, 289),
+		BackgroundTransparency = 1,
+
+		[Children] = {
+			New "UICorner" {},
+
+			New "UIPadding" {
+				PaddingBottom = UDim.new(0, 8),
+				PaddingLeft = UDim.new(0, 8),
+				PaddingRight = UDim.new(0, 8),
+				PaddingTop = UDim.new(0, 8)
+			},
+
+			New "Frame" {
+				Name = "Output",
+				AnchorPoint = Vector2.new(0, 1),
+				BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+				Position = UDim2.new(0, 0, 1, -39),
+				Size = UDim2.fromOffset(33, 33),
+				BackgroundTransparency = 1,
+				ZIndex = 10,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					}
+				}
+			},
+
+			New "ImageButton" {
+				Name = "Hue",
+				AnchorPoint = Vector2.new(1, 0),
+				BackgroundColor3 = Color3.new(1, 1, 1),
+				Position = UDim2.fromScale(1, 0),
+				Selectable = false,
+				Size = UDim2.fromOffset(33, 193),
+				AutoButtonColor = false,
+				BackgroundTransparency = 1,
+				ZIndex = 10,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "UIGradient" {
+						Color = ColorSequence.new({
+							ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+							ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 0, 255)),
+							ColorSequenceKeypoint.new(0.34, Color3.fromRGB(0, 0, 255)),
+							ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 255, 255)),
+							ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 255, 0)),
+							ColorSequenceKeypoint.new(0.84, Color3.fromRGB(255, 255, 0)),
+							ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+						}),
+
+						Rotation = 90
+					},
+
+					New "TextLabel" {
+						Name = "Slider",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundColor3 = Color3.new(1, 1, 1),
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						Position = UDim2.fromScale(1, 0),
+						Size = UDim2.fromOffset(16, 6),
+						Font = Enum.Font.GothamSemibold,
+						Text = "<",
+						TextColor3 = Color3.new(1, 1, 1),
+						TextSize = 20,
+						TextTransparency = 1,
+						ZIndex = 11,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							}
+						}
+					}
+				}
+			},
+
+			New "ImageButton" {
+				Name = "Saturation",
+				AnchorPoint = Vector2.new(1, 0),
+				BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+				Position = UDim2.new(1, -42, 0, 0),
+				Selectable = false,
+				Size = UDim2.fromOffset(192, 190),
+				BackgroundTransparency = 1,
+				AutoButtonColor = false,
+				ZIndex = 10,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6),
+					},
+
+					New "Frame" {
+						Name = "Value",
+						AnchorPoint = Vector2.new(1, 0),
+						BackgroundColor3 = Color3.new(1, 1, 1),
+						Position = UDim2.fromScale(1, 0),
+						Size = UDim2.fromOffset(192, 193),
+						BackgroundTransparency = 1,
+						ZIndex = 11,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							},
+
+							New "UIGradient" {
+								Color = ColorSequence.new({
+									ColorSequenceKeypoint.new(0, Color3.new()),
+									ColorSequenceKeypoint.new(1, Color3.new())
+								}),
+
+								Rotation = -90,
+								Transparency = NumberSequence.new({
+									NumberSequenceKeypoint.new(0, 0, 0),
+									NumberSequenceKeypoint.new(1, 1, 0)
+								})
+							}
+						}
+					},
+
+					New "Frame" {
+						Name = "Value",
+						AnchorPoint = Vector2.new(1, 0),
+						BackgroundColor3 = Color3.new(1, 1, 1),
+						Position = UDim2.fromScale(1, 0),
+						Size = UDim2.fromOffset(192, 192),
+						BackgroundTransparency = 1,
+						ZIndex = 10,
+
+						[Children] = {
+							New "UICorner" {
+								CornerRadius = UDim.new(0, 6)
+							},
+
+							New "UIGradient" {
+								Transparency = NumberSequence.new({
+									NumberSequenceKeypoint.new(0, 0, 0),
+									NumberSequenceKeypoint.new(1, 1, 0)
+								})
+							}
+						}
+					},
+
+					New "TextLabel" {
+						Name = "Slider",
+						AnchorPoint = Vector2.new(0.5, 0.5),
+						BackgroundColor3 = Color3.new(1, 1, 1),
+						BackgroundTransparency = 1,
+						BorderSizePixel = 0,
+						Position = UDim2.fromScale(1, 0),
+						Size = UDim2.fromOffset(10, 10),
+						Font = Enum.Font.GothamSemibold,
+						Text = "+",
+						TextColor3 = Color3.new(1, 1, 1),
+						TextSize = 20,
+						TextTransparency = 1,
+						ZIndex = 12
+					}
+				}
+			},
+
+			New "TextBox" {
+				Name = "RGB",
+				AnchorPoint = Vector2.new(1, 1),
+				ZIndex = 10,
+
+				BackgroundColor3 = Computed(function()
+					return config.ContainerBackgroundColor
+				end),
+
+				BorderSizePixel = 0,
+				Position = UDim2.new(1, 0, 1, -39),
+				Size = UDim2.fromOffset(108, 33),
+				ClearTextOnFocus = false,
+				Font = Enum.Font.Gotham,
+				Text = "255, 255, 255",
+
+				TextColor3 = Computed(function()
+					return config.TextColor
+				end),
+
+				TextSize = 14,
+				TextTransparency = 1,
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "UIStroke" {
+						ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+
+						Color = Computed(function()
+							return config.Accent
+						end),
+
+						Thickness = 1.6,
+						Transparency = 1
+					}
+				}
+			},
+
+			New "TextBox" {
+				Name = "Hex",
+				AnchorPoint = Vector2.new(1, 1),
+				ZIndex = 10,
+
+				BackgroundColor3 = Computed(function()
+					return config.ContainerBackgroundColor
+				end),
+
+				BorderSizePixel = 0,
+				Position = UDim2.new(1, -116, 1, -39),
+				Size = UDim2.fromOffset(77, 33),
+				ClearTextOnFocus = false,
+				Font = Enum.Font.Gotham,
+				Text = "#ffffff",
+
+				TextColor3 = Computed(function()
+					return config.TextColor
+				end),
+
+				TextSize = 14,
+				TextTransparency = 1,
+				BackgroundTransparency = 1,
+				TextWrapped = true,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "UIStroke" {
+						ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+
+						Color = Computed(function()
+							return config.Accent
+						end),
+
+						Thickness = 1.6,
+						Transparency = 1
+					}
+				}
+			},
+
+			New "TextButton" {
+				Name = "Cancel",
+				AnchorPoint = Vector2.new(1, 1),
+
+				BackgroundColor3 = Computed(function()
+					return config.ContainerBackgroundColor
+				end),
+
+				BorderColor3 = Color3.new(),
+				BorderSizePixel = 0,
+				Position = UDim2.fromScale(1, 1),
+				Size = UDim2.new(0.5, -4, 0, 30),
+				AutoButtonColor = false,
+				Font = Enum.Font.Gotham,
+				TextTransparency = 1,
+				BackgroundTransparency = 1,
+				Text = "Cancel",
+				ZIndex = 10,
+
+				TextColor3 = Computed(function()
+					return config.TextColor
+				end),
+
+				TextSize = 13,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "UIPadding" {
+						PaddingLeft = UDim.new(0, 6),
+						PaddingRight = UDim.new(0, 6)
+					}
+				}
+			},
+
+			New "TextButton" {
+				Name = "Done",
+				AnchorPoint = Vector2.new(0, 1),
+
+				BackgroundColor3 = Computed(function()
+					return config.Accent
+				end),
+
+				BorderColor3 = Color3.new(),
+				BorderSizePixel = 0,
+				Position = UDim2.fromScale(0, 1),
+				Size = UDim2.new(0.5, -4, 0, 30),
+				ZIndex = 10,
+				AutoButtonColor = false,
+				Font = Enum.Font.Gotham,
+				Text = "Done",
+				TextTransparency = 1,
+				BackgroundTransparency = 1,
+
+				TextColor3 = Computed(function()
+					return config.TextColor
+				end),
+
+				TextSize = 13,
+
+				[Children] = {
+					New "UICorner" {
+						CornerRadius = UDim.new(0, 6)
+					},
+
+					New "UIPadding" {
+						PaddingLeft = UDim.new(0, 6),
+						PaddingRight = UDim.new(0, 6)
+					}
+				}
+			}
+		}
+	}
+
+	self.widget = widget
+end
+
+function dialog:open(startColor)
+	if self._dialog then return end
+
+	self._dialog = true
+	self._yield = true
+
+	config.Locked:set(true)
+	self.widget.Visible = true
+
+	local mouse = plugin:GetMouse()
+
+	Tween(self.widget, outQuick, { Position = UDim2.fromScale(0.5, 0.5), BackgroundTransparency = 0 })
+	Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 0.5 })
+
+	for index, element in ipairs(self.widget:GetDescendants()) do
+		if checkProperty(element, "BackgroundTransparency") and element.Name ~= "Slider" then
+			Tween(element, outQuick, { BackgroundTransparency = 0 })
+		elseif element.Name == "Slider" then
+			Tween(element, outQuick, { TextStrokeTransparency = 0 })
+		end
+
+		if checkProperty(element, "TextTransparency") then
+			Tween(element, outQuick, { TextTransparency = 0 })
+		end
+	end
+
+	self._connections["done"] = self.widget.Done.MouseButton1Click:Connect(function()
+		self._yield = false
+
+		config.Locked:set(false)
+
+		local mainTween = Tween(self.widget, outQuick, { Position = UDim2.new(0.5, 0, 0.5, -20), BackgroundTransparency = 1 })
+		Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+
+		for index, element in ipairs(self.widget:GetDescendants()) do
+			if checkProperty(element, "BackgroundTransparency") and element.Name ~= "Slider" then
+				Tween(element, outQuick, { BackgroundTransparency = 1 })
+			elseif element.Name == "Slider" then
+				Tween(element, outQuick, { TextStrokeTransparency = 1 })
+			end
+
+			if checkProperty(element, "TextTransparency") then
+				Tween(element, outQuick, { TextTransparency = 1 })
+			end
+		end
+
+		for index, connection in pairs(self._connections) do
+			connection:Disconnect()
+		end
+
+		mainTween.Completed:Wait()
+
+		self.widget.Visible = false
+		self._dialog = false
+	end)
+
+	self._connections["cancel"] = self.widget.Cancel.MouseButton1Click:Connect(function()
+		self._cancelled = true
+		self._yield = false
+
+		config.Locked:set(false)
+
+		local mainTween = Tween(self.widget, outQuick, { Position = UDim2.new(0.5, 0, 0.5, -40), BackgroundTransparency = 1 })
+		Tween(self.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+
+		for index, element in ipairs(self.widget:GetDescendants()) do
+			if checkProperty(element, "BackgroundTransparency") and element.Name ~= "Slider" then
+				Tween(element, outQuick, { BackgroundTransparency = 1 })
+			elseif element.Name == "Slider" then
+				Tween(element, outQuick, { TextStrokeTransparency = 1 })
+			end
+
+			if checkProperty(element, "TextTransparency") then
+				Tween(element, outQuick, { TextTransparency = 1 })
+			end
+		end
+
+		for index, connection in pairs(self._connections) do
+			connection:Disconnect()
+		end
+
+		mainTween.Completed:Wait()
+
+		self.widget.Visible = false
+		self._dialog = false
+	end)
+
+	self._connections["doneHover"] = self.widget.Done.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+
+	self._connections["doneUnHover"] = self.widget.Done.MouseLeave:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/Arrow"
+	end)
+
+	self._connections["cancelHover"] = self.widget.Cancel.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+
+	self._connections["cancelUnHover"] = self.widget.Cancel.MouseLeave:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/Arrow"
+	end)
+
+	local isHueDown = false
+	local isSaturationDown = false
+
+	local h, s, v = startColor:ToHSV()
+
+	self.widget.Hex.Text = "#" .. startColor:ToHex()
+	self.widget.RGB.Text = string.format("%d, %d, %d", startColor.R * 255, startColor.G * 255, startColor.B * 255)
+
+	self.widget.Output.BackgroundColor3 = startColor
+	self.widget.Hue.Slider.Position = UDim2.new(1, 0, 0, (1-h) * self.widget.Hue.AbsoluteSize.Y)
+	self.widget.Saturation.Slider.Position = UDim2.new(s, 0, 1-v, 0)
+	self.widget.Saturation.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+
+	self.hue = h
+	self.sat = s
+	self.value = v
+
+	self.widget.Hue.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement and not self._connections["run"] then
+			self._connections["run"] = RunService.RenderStepped:Connect(function()
+				pcall(function()
+					if isHueDown then
+						local y = input.Position.Y - self.widget.Hue.AbsolutePosition.Y
+						local hue = math.clamp(y / self.widget.Hue.AbsoluteSize.Y, 0, 1)
+						local color = Color3.fromHSV(1-hue, self.sat, self.value)
+
+						y = math.clamp(y, 0, self.widget.Hue.AbsoluteSize.Y)
+
+						self.hue = 1-hue
+
+						self.widget.Hue.Slider.Position = UDim2.new(1, 0, 0, y)
+						self.widget.Saturation.BackgroundColor3 = Color3.fromHSV(1-hue, 1, 1)
+						self.widget.Output.BackgroundColor3 = color
+						self.widget.Hex.Text = "#" .. color:ToHex()
+						self.widget.RGB.Text = string.format("%d, %d, %d", color.R * 255, color.G * 255, color.B * 255)
+					end
+
+					self.widget.Output.BackgroundColor3 = Color3.fromHSV(self.hue, self.sat, self.value)
+				end)
+			end)
+		end
+	end)
+
+	self.widget.Hue.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			isHueDown = false
+			mouse.Icon = "rbxasset://SystemCursors/Arrow"
+		end
+	end)
+
+	self.widget.Saturation.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement and not self._connections["run2"] then
+			self._connections["run2"] = RunService.RenderStepped:Connect(function()
+				if isSaturationDown then
+					local y = input.Position.Y - self.widget.Saturation.AbsolutePosition.Y
+					local x = input.Position.X - self.widget.Saturation.AbsolutePosition.X
+
+					local sat = math.clamp(x / self.widget.Saturation.AbsoluteSize.X, 0, 1)
+					local val = math.clamp(y / self.widget.Saturation.AbsoluteSize.Y, 0, 1)
+
+					local color = Color3.fromHSV(self.hue, sat, 1-val)
+
+					y = math.clamp(y, 0, self.widget.Saturation.AbsoluteSize.Y)
+					x = math.clamp(x, 0, self.widget.Saturation.AbsoluteSize.X)
+
+					self.value = 1-val
+					self.sat = sat
+
+					self.widget.Output.BackgroundColor3 = color
+					self.widget.Saturation.Slider.Position = UDim2.new(0, x, 0, y)
+					self.widget.Hex.Text = "#" .. color:ToHex()
+					self.widget.RGB.Text = string.format("%d, %d, %d", color.R * 255, color.G * 255, color.B * 255)
+				end
+			end)
+		end
+	end)
+
+	self.widget.Saturation.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			isSaturationDown = false
+			mouse.Icon = "rbxasset://SystemCursors/Arrow"
+		end
+	end)
+
+	self.widget.Hex.FocusLost:Connect(function()
+		local success, color = pcall(Color3.fromHex, self.widget.Hex.Text)
+
+		if not success then color = Color3.new(1, 1, 1) end
+
+		local h, s, v = color:ToHSV()
+
+		self.widget.Hex.Text = "#" .. color:ToHex()
+		self.widget.RGB.Text = string.format("%d, %d, %d", color.R * 255, color.G * 255, color.B * 255)
+		self.widget.Output.BackgroundColor3 = color
+		self.widget.Saturation.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+		self.widget.Hue.Slider.Position = UDim2.new(1, 0, 0, (1-h) * self.widget.Hue.AbsoluteSize.Y)
+		self.widget.Saturation.Slider.Position = UDim2.new(s, 0, 1-v, 0)
+
+		self.hue = h
+		self.sat = s
+		self.value = v
+
+		Tween(self.widget.Hex.UIStroke, outQuick, { Transparency = 1 })
+	end)
+
+	self.widget.Hex.Focused:Connect(function()
+		Tween(self.widget.Hex.UIStroke, outQuick, { Transparency = 0 })
+	end)
+
+	self.widget.RGB.FocusLost:Connect(function()
+		local c = math.clamp
+		local r, g, b = self.widget.RGB.Text:match("(.+), (.+), (.+)")
+
+		if r == nil or g == nil or b == nil then
+			r, g, b = self.widget.RGB.Text:match("(.+),(.+),(.+)")
+		end
+
+		local s = pcall(function()
+			r, g, b = c(r, 0, 255), c(g, 0, 255), c(b, 0, 255)
+		end)
+
+		if not s then
+			r, g, b = 255, 255, 255
+		end
+
+		local success, color = pcall(Color3.fromRGB, r, g, b)
+		if not success then color = Color3.new(1, 1, 1) end
+
+		local h, s, v = color:ToHSV()
+
+		self.widget.Hex.Text = "#" .. color:ToHex()
+		self.widget.RGB.Text = string.format("%d, %d, %d", color.R * 255, color.G * 255, color.B * 255)
+		self.widget.Output.BackgroundColor3 = color
+		self.widget.Saturation.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+		self.widget.Hue.Slider.Position = UDim2.new(1, 0, 0, (1-h) * self.widget.Hue.AbsoluteSize.Y)
+		self.widget.Saturation.Slider.Position = UDim2.new(s, 0, 1-v, 0)
+
+		self.hue = h
+		self.sat = s
+		self.value = v
+
+		Tween(self.widget.RGB.UIStroke, outQuick, { Transparency = 1 })
+	end)
+
+	self.widget.RGB.Focused:Connect(function()
+		Tween(self.widget.RGB.UIStroke, outQuick, { Transparency = 0 })
+	end)
+
+	self.widget.Hue.MouseButton1Down:Connect(function()
+		isHueDown = true
+	end)
+
+	self.widget.Hue.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+
+	self.widget.Saturation.MouseButton1Down:Connect(function()
+		isSaturationDown = true
+	end)
+
+	self.widget.Saturation.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+end
+
+function dialog:completed()
+	repeat task.wait() until self._yield == false
+
+	if not self._cancelled then
+		return self.widget.Output.BackgroundColor3
+	else
+		self._cancelled = false
+	end
+end
+
+return module.new()]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXE6390C2BBCB0491CA9B290B11F46B28E">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Classes</string>
+					<string name="ScriptGuid">{44C7DC97-D63F-4ED2-B18E-B0D3DC4C7D81}</string>
+					<ProtectedString name="Source"><![CDATA[-- it is basically my version of old Fusion but with less features and smaller file size
+-- no, I didn't use Fusion's source. the api is almost the same because I didn't want to rewrite everything (and it looks pretty nice)
+
+local methods = {}
+
+methods.New = require(script.New)
+methods.Children = require(script.Children)
+methods.State = require(script.State)
+methods.OnEvent = require(script.OnEvent)
+methods.Computed = require(script.Computed)
+
+return methods]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+				<Item class="ModuleScript" referent="RBXAAB9936EF23649D08ED46631E57838A1">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">New</string>
+						<string name="ScriptGuid">{838A770B-0660-4C96-B3CE-35356EA20BB7}</string>
+						<ProtectedString name="Source"><![CDATA[-- makes new class with a given set of properties
+-- no error checks :trol:
+
+return function(class)
+	return function(props)
+		local obj = Instance.new(class)
+
+		for prop, val in pairs(props) do
+			if prop == "children" then
+				continue
+			elseif typeof(prop) == "function" then
+				prop(obj, val)
+			elseif typeof(prop) == "table" then
+				for _, inst in pairs(prop) do
+					if typeof(inst) == "Instance" then
+						inst.Parent = obj
+					end
+				end
+			else
+				if typeof(val) == "function" then
+					val(obj, prop)
+				else
+					obj[prop] = val
+				end
+			end
+		end
+
+		if props.children then
+			for _, child in pairs(props.children) do
+				if typeof(child) == "table" then
+					for _, inst in pairs(child) do
+						if typeof(inst) == "Instance" then
+							inst.Parent = obj
+						end
+					end
+				else
+					child.Parent = obj
+				end
+			end
+		end
+
+		return obj
+	end
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBX3113084F903D4700BA9109607399FE7C">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Computed</string>
+						<string name="ScriptGuid">{0869D204-19C7-4907-898A-402D8B93ECE4}</string>
+						<ProtectedString name="Source"><![CDATA[-- listen to changes of a state object
+
+return function(func)
+	local state_ = func()
+
+	return function(obj, prop)
+		local disconnect
+
+		local function changed()
+			local state, useNot = func()
+
+			if state:get() ~= state_:get() then
+				disconnect = state.__changed__(changed, obj)
+				state_ = state
+				disconnect()
+			end
+
+			local val = state:get()
+
+			if useNot then
+				val = not state:get()
+			end
+
+			obj[prop] = val
+		end
+
+		disconnect = state_.__changed__(changed, obj)
+		changed()
+
+		obj.Destroying:Connect(function()
+			disconnect()
+		end)
+	end
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBXDB4CB3AF201A41D29C7FC50642E0BDFD">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">Children</string>
+						<string name="ScriptGuid">{76FFC8CD-790F-44ED-B95F-4BD57D69BE6D}</string>
+						<ProtectedString name="Source"><![CDATA[-- indexes the "Children" table
+
+return "children"]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBXBC7C9ECF6D9C4B71962426BE2E18C39C">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">OnEvent</string>
+						<string name="ScriptGuid">{0470A579-C559-4FE4-88AC-4E48C3AD4347}</string>
+						<ProtectedString name="Source"><![CDATA[-- connets an event to a function
+
+return function(name)
+	return function(obj, func)
+		obj[name]:Connect(function(...)
+			func(...)
+		end)
+	end
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+				<Item class="ModuleScript" referent="RBXEB6F6F70A91041A19FE886353CD96B52">
+					<Properties>
+						<BinaryString name="AttributesSerialize"></BinaryString>
+						<Content name="LinkedSource"><null></null></Content>
+						<string name="Name">State</string>
+						<string name="ScriptGuid">{F0E67366-C697-49C8-B4EE-8661B16BF572}</string>
+						<ProtectedString name="Source"><![CDATA[-- a simple state managment system
+
+return function(value)
+	local save = value
+	local changed = {}
+	local methods = {}
+
+	function methods:get(expanded)
+		return save
+	end
+
+	function methods:set(new, force)
+		if new == save and not force then
+			return
+		end
+
+		save = new
+
+		for _, func in pairs(changed) do
+			func()
+		end
+	end
+
+	function methods.__changed__(func, obj)
+		local index = 1
+
+		for _, _ in pairs(changed) do
+			index += 1
+		end
+
+		-- for some reason some elements are not listening for state changes, changing the index from a number to a string seems to fix the problem.
+		local newindex = tostring(index) .. tick()
+		changed[newindex] = func
+
+		return function()
+			changed[newindex] = nil
+		end
+	end
+
+	return methods
+end]]></ProtectedString>
+						<int64 name="SourceAssetId">-1</int64>
+						<BinaryString name="Tags"></BinaryString>
+					</Properties>
+				</Item>
+			</Item>
+			<Item class="ModuleScript" referent="RBX465D2F80825147B9975D8C11829FE6A9">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Notify</string>
+					<string name="ScriptGuid">{3335DD55-DC76-4182-AE56-608712A46AD5}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local Classes = main:getModule("Classes")
+local config = main:getModule("Settings")()
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local New = Classes.New
+local Children = Classes.Children
+local Computed = Classes.Computed
+local OnEvent = Classes.OnEvent
+
+local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
+local outQuick = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+local module = { _dialog = nil, _yield = false, _connections = {} }
+
+local function Tween(instance, tweenInfo, goal)
+	local tween = TweenService:Create(instance, tweenInfo, goal)
+	tween:Play()
+
+	return tween
+end
+
+local function checkProperty(instance, name)
+	local newInstance = instance:Clone()
+	newInstance:ClearAllChildren()
+
+	local success = pcall(function()
+		return newInstance[name]
+	end)
+
+	return success
+end
+
+function module:createDialog(mainWidget) -- (one time only)
+	local widget = New "Frame" {
+		Name = "Notification",
+		Parent = mainWidget.Main,
+
+		Visible = false,
+
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+		ZIndex = 10,
+
+		Size = UDim2.fromOffset(270, 65),
+		Position = UDim2.new(0.5, 0, 0.5, -20),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+
+		BackgroundColor3 = Computed(function()
+			return config.DefaultColor
+		end),
+
+		[Children] = {
+			New "UICorner" {
+				CornerRadius = UDim.new(0, 6)
+			}
+		}
+	}
+
+	New "TextLabel" {
+		Name = "TextObject",
+		Parent = widget,
+		BackgroundTransparency = 1,
+
+		Size = UDim2.fromScale(0.9, 0),
+		Position = UDim2.fromScale(0.5, 0.43),
+		AnchorPoint = Vector2.new(0.5, 0.5),
+
+		Font = Enum.Font.Gotham,
+
+		ZIndex = 11,
+		TextSize = 14,
+		TextWrapped = true,
+		RichText = true,
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end)
+	}
+
+	New "TextLabel" {
+		Parent = widget,
+		Name = "Title",
+
+		Font = Enum.Font.GothamSemibold,
+
+		TextSize = 16,
+		BorderSizePixel = 0,
+		BackgroundTransparency = 1,
+
+		ZIndex = 11,
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end),
+
+		Size = UDim2.new(1, 0, 0, 16),
+		Position = UDim2.new(0.5, 0, 0, 8),
+		AnchorPoint = Vector2.new(0.5, 0),
+
+		TextTransparency = 1,
+	}
+
+	local done = New "TextButton" {
+		Parent = widget,
+		Name = "Done",
+		Text = "Okay",
+		Font = Enum.Font.Gotham,
+
+		ZIndex = 11,
+
+		TextSize = 13,
+		BorderSizePixel = 0,
+
+		Size = UDim2.new(1, -20, 0, 30),
+		Position = UDim2.new(0, 10, 1, -10),
+		AnchorPoint = Vector2.new(0, 1),
+		BackgroundTransparency = 1,
+		TextTransparency = 1,
+		AutoButtonColor = false,
+
+		BackgroundColor3 = Computed(function()
+			return config.Accent
+		end),
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end),
+
+		[Children] = {
+			New "UICorner" {
+				CornerRadius = UDim.new(0, 6)
+			},
+
+			New "UIPadding" {
+				PaddingLeft = UDim.new(0, 6),
+				PaddingRight = UDim.new(0, 6)
+			}
+		}
+	}
+
+	module.widget = widget
+end
+
+function module.create(name, text, doneText)
+	if module._dialog then repeat task.wait() until not module._dialog end
+
+	module._dialog = true
+	module._yield = true
+
+	config.Locked:set(true)
+
+	module.widget.TextObject.Text = text
+	module.widget.Size = UDim2.fromOffset(240, 80 + module.widget.TextObject.TextBounds.Y)
+	module.widget.Title.Text = name
+	module.widget.Done.Text = doneText
+	module.widget.Visible = true
+
+	local mouse = plugin:GetMouse()
+
+	Tween(module.widget, outQuick, { Position = UDim2.fromScale(0.5, 0.5), BackgroundTransparency = 0 })
+	Tween(module.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 0.5 })
+
+	for index, element in ipairs(module.widget:GetDescendants()) do
+		if checkProperty(element, "BackgroundTransparency") and element.Name ~= "TextObject" and element.Name ~= "Title" then
+			Tween(element, outQuick, { BackgroundTransparency = 0 })
+		end
+
+		if checkProperty(element, "TextTransparency") then
+			Tween(element, outQuick, { TextTransparency = 0 })
+		end
+	end
+
+	module._connections["done"] = module.widget.Done.MouseButton1Click:Connect(function()
+		module._yield = false
+
+		config.Locked:set(false)
+
+		local mainTween = Tween(module.widget, outQuick, { Position = UDim2.new(0.5, 0, 0.5, -20), BackgroundTransparency = 1 })
+		Tween(module.widget.Parent.DarkFilter, outQuick, { BackgroundTransparency = 1 })
+
+		for index, element in ipairs(module.widget:GetDescendants()) do
+			if checkProperty(element, "BackgroundTransparency") then
+				Tween(element, outQuick, { BackgroundTransparency = 1 })
+			end
+
+			if checkProperty(element, "TextTransparency") then
+				Tween(element, outQuick, { TextTransparency = 1 })
+			end
+		end
+
+		for index, connection in pairs(module._connections) do
+			connection:Disconnect()
+		end
+
+		mainTween.Completed:Wait()
+
+		module.widget.Visible = false
+		module._dialog = false
+	end)
+
+	module._connections["doneHover"] = module.widget.Done.MouseEnter:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/PointingHand"
+	end)
+
+	module._connections["doneUnHover"] = module.widget.Done.MouseLeave:Connect(function()
+		mouse.Icon = "rbxasset://SystemCursors/Arrow"
+	end)
+end
+
+function module.completed()
+	repeat task.wait() until module._yield == false
+end
+
+return module]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBXE1BC9021083E4F7DBB171137C1D885AE">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">SmoothScroll</string>
+					<string name="ScriptGuid">{A4499ADA-115B-4682-AF53-1C5B413293DE}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local Classes = main:getModule("Classes")
+local config = main:getModule("Settings")()
+
+local Computed = Classes.Computed
+
+return function(content, smoothFactor)
+	smoothFactor = smoothFactor or 0.4
+	content.ScrollingEnabled = false
+
+	local input = content:Clone()
+	input:ClearAllChildren()
+	input.BackgroundTransparency = 1
+	input.ScrollBarImageTransparency = 1
+	input.ZIndex = content.ZIndex + 1
+	input.Name = "_smoothinputframe"
+	input.ScrollingEnabled = true
+	input.Parent = content.Parent
+
+	config.Locked.__changed__(function()
+		input.ScrollingEnabled = not config.Locked:get()
+	end, { Name = content.Name .. tick() })
+
+	local function syncProperty(prop)
+		content:GetPropertyChangedSignal(prop):Connect(function()
+			if prop == "ZIndex" then
+				input[prop] = content[prop] + 1
+			else
+				input[prop] = content[prop]
+			end
+		end)
+	end
+
+	syncProperty "CanvasSize"
+	syncProperty "Position"
+	syncProperty "Rotation"
+	syncProperty "ScrollingDirection"
+	syncProperty "ScrollBarThickness"
+	syncProperty "BorderSizePixel"
+	syncProperty "ElasticBehavior"
+	syncProperty "SizeConstraint"
+	syncProperty "ZIndex"
+	syncProperty "BorderColor3"
+	syncProperty "Size"
+	syncProperty "AnchorPoint"
+	syncProperty "Visible"
+
+	local smoothConnection = game:GetService("RunService").RenderStepped:Connect(function()
+		local a = content.CanvasPosition
+		local b = input.CanvasPosition
+		local c = smoothFactor
+		local d = (b - a) * c + a
+
+		content.CanvasPosition = d
+	end)
+
+	content.AncestryChanged:Connect(function()
+		if content.Parent == nil then
+			input:Destroy()
+			smoothConnection:Disconnect()
+		end
+	end)
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+			<Item class="ModuleScript" referent="RBX72AD1D182B064E76BCD1D3399C8FCD40">
+				<Properties>
+					<BinaryString name="AttributesSerialize"></BinaryString>
+					<Content name="LinkedSource"><null></null></Content>
+					<string name="Name">Tooltip</string>
+					<string name="ScriptGuid">{AD7CCFF4-7FD4-4B21-851E-1B790C113F0E}</string>
+					<ProtectedString name="Source"><![CDATA[local main = _G.UIToolsMain
+
+local Classes = main:getModule("Classes")
+local TweenService = game:GetService("TweenService")
+local config = main:getModule("Settings")()
+
+local outQuick = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+local New = Classes.New
+local Children = Classes.Children
+local Computed = Classes.Computed
+
+local function Tween(instance, tweenInfo, goal)
+	local tween = TweenService:Create(instance, tweenInfo, goal)
+	tween:Play()
+
+	return tween
+end
+
+return function(parent, tip, widget)
+	local visible, enter = false, false
+
+	local tooltip = New "TextLabel" {
+		Parent = parent,
+		Name = "Tooltip",
+		Text = tip,
+		TextWrapped = true,
+
+		BackgroundColor3 = Computed(function()
+			return config.TooltipColor
+		end),
+
+		TextColor3 = Computed(function()
+			return config.TextColor
+		end),
+
+		Font = Enum.Font.GothamSemibold,
+		BackgroundTransparency = 1,
+		TextTransparency = 1,
+		TextSize = 13,
+		ZIndex = 999,
+
+		[Children] = {
+			New "UICorner" {
+				CornerRadius = UDim.new(0, 6)
+			},
+
+			New "UIPadding" {
+				PaddingLeft = UDim.new(0, 4),
+				PaddingRight = UDim.new(0, 4),
+				PaddingTop = UDim.new(0, 4),
+				PaddingBottom = UDim.new(0, 4)
+			}
+		}
+	}
+
+	local dropShadow2 = Instance.new("Frame")
+	dropShadow2.Name = "Shadow"
+	dropShadow2.AnchorPoint = Vector2.new(0.5, 0.5)
+	dropShadow2.Size = UDim2.new(1, 16, 1, 16)
+	dropShadow2.BackgroundTransparency = 1
+	dropShadow2.Position = UDim2.new(0.5, 0, 0.5, 0)
+	dropShadow2.Parent = tooltip
+
+	local aimbient = Instance.new("ImageLabel")
+	aimbient.Size = UDim2.new(1, 0, 1, 0)
+	aimbient.BackgroundTransparency = 1
+	aimbient.ScaleType = Enum.ScaleType.Slice
+	aimbient.ImageTransparency = 1
+	aimbient.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	aimbient.Image = "rbxassetid://1316045217"
+	aimbient.SliceCenter = Rect.new(10, 10, 118, 118)
+	aimbient.ZIndex = 998
+	aimbient.Parent = dropShadow2
+
+	local penumbra = Instance.new("ImageLabel")
+	penumbra.Size = UDim2.new(1, 0, 1, 0)
+	penumbra.BackgroundTransparency = 1
+	penumbra.ScaleType = Enum.ScaleType.Slice
+	penumbra.ImageTransparency = 1
+	penumbra.ImageColor3 = Color3.fromRGB(0, 0, 0)
+	penumbra.Image = "rbxassetid://1316045217"
+	penumbra.SliceCenter = Rect.new(10, 10, 118, 118)
+	penumbra.ZIndex = 998
+	penumbra.Parent = dropShadow2
+
+	local x, y, lastAt = 0, 0, -1
+	local lastMove = os.clock()
+	local clamp = 0.85
+
+	local function upd()
+		visible = true
+
+		local toAdd = UDim2.fromOffset(8, 8)
+		local s = (x + 75 > widget.AbsoluteSize.X * clamp) and Vector2.new(math.clamp((widget.AbsoluteSize.X * clamp) - ((widget.AbsoluteSize.X * clamp) - x), 0, x * clamp), 300) or Vector2.new((widget.AbsoluteSize.X * clamp) - x, 300)
+		local size = game:GetService("TextService"):GetTextSize(tip, tooltip.TextSize, tooltip.Font, s)
+
+		-- alignment on x axis
+		if x + size.X > widget.AbsoluteSize.X * clamp then
+			toAdd = UDim2.fromOffset(-8, -8)
+			tooltip.AnchorPoint = Vector2.new(1, 0)
+		else
+			tooltip.AnchorPoint = Vector2.zero
+		end
+
+		-- alignment on y axis
+		if (y + 30) + size.Y > (widget.AbsoluteSize.Y * clamp) - (y + 30) then
+			tooltip.AnchorPoint = Vector2.new(tooltip.AnchorPoint.X, 1)
+		else
+			tooltip.AnchorPoint = Vector2.new(tooltip.AnchorPoint.X, 0)
+		end
+
+		tooltip.Size = UDim2.fromOffset(size.X + 8, size.Y + 8)
+		tooltip.Position = UDim2.fromOffset(x - parent.AbsolutePosition.X, y - parent.AbsolutePosition.Y) + toAdd
+
+		Tween(tooltip, outQuick, { BackgroundTransparency = 0, TextTransparency = 0 })
+		Tween(aimbient, outQuick, { ImageTransparency = 0.7 }); Tween(penumbra, outQuick, { ImageTransparency = 0.7 })
+	end
+
+	local con = game:GetService("RunService").RenderStepped:Connect(function()
+		if visible and x + y ~= lastAt then
+			visible, lastAt = false, x + y
+
+			Tween(tooltip, outQuick, { BackgroundTransparency = 1, TextTransparency = 1 })
+			Tween(aimbient, outQuick, { ImageTransparency = 1 }); Tween(penumbra, outQuick, { ImageTransparency = 1 })
+		elseif os.clock() - lastMove >= 0.7 and not visible and enter and not config.Locked:get() then
+			upd()
+		end
+	end)
+
+	parent.Destroying:Connect(function()
+		con:Disconnect()
+	end)
+
+	parent.MouseMoved:Connect(function(x1, y1)
+		x, y, enter, lastMove = x1, y1, true, os.clock()
+	end)
+
+	parent.MouseLeave:Connect(function()
+		visible, enter = false, false
+		Tween(tooltip, outQuick, { BackgroundTransparency = 1, TextTransparency = 1 })
+		Tween(aimbient, outQuick, { ImageTransparency = 1 }); Tween(penumbra, outQuick, { ImageTransparency = 1 })
+	end)
+
+	return function(newtip)
+		tooltip.Text = newtip
+		tip = newtip
+		upd()
+	end
+end]]></ProtectedString>
+					<int64 name="SourceAssetId">-1</int64>
+					<BinaryString name="Tags"></BinaryString>
+				</Properties>
+			</Item>
+		</Item>
+		<Item class="Script" referent="RBXF8EF53B2474B4DC991682C1F6DBA6B99">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<bool name="Disabled">false</bool>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">Main</string>
+				<token name="RunContext">0</token>
+				<string name="ScriptGuid">{63609100-C4B0-4DF7-A9DA-D1955352FC16}</string>
+				<ProtectedString name="Source"><![CDATA[if not plugin or game:GetService("RunService"):IsRunning() then return end
+
+local methods = {}
+local active = true
+
+-- the stupid api doesn't allow to remove the toolbar
+local toolbar = plugin:CreateToolbar("UI Tools")
+local button = toolbar:CreateButton("Tools", "High quality tools for your UI.", "")
+
+local function init()
+	require(script.Parent.Init)(toolbar, button)
+
+	repeat task.wait() until not active
+	active = true
+
+	coroutine.yield()
+end
+
+local thread = coroutine.create(init)
+coroutine.resume(thread)
+
+function methods.restart()
+	-- set the state to not loaded
+	_G.UIToolsMain:getModule("DataManager").loaded = false
+	_G.UIToolsMain = nil
+
+	-- let the yielding function know that we want it to suspend
+	active = false
+	thread = coroutine.create(init)
+
+	-- now wait until it suspends itself
+	repeat task.wait() until active
+
+	-- resume the new thread
+	coroutine.resume(thread)
+end
+
+plugin.Unloading:Connect(function()
+	_G.UIToolsThread = nil
+	coroutine.close(thread)
+end)
+
+_G.UIToolsThread = methods]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="ModuleScript" referent="RBX765DC7D9030848AFACED6C8F91C0EE1E">
+			<Properties>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<Content name="LinkedSource"><null></null></Content>
+				<string name="Name">Init</string>
+				<string name="ScriptGuid">{5DEDA3E5-641B-40D4-9CDC-1E93D91779AB}</string>
+				<ProtectedString name="Source"><![CDATA[local cachedBefore = false
+
+return function(toolbar, button)
+	if _G.UIToolsMain then
+		warn("_G.UIToolsMain is already taken. You may have to re-open the studio.")
+		task.wait(1)
+		_G.UIToolsMain = nil
+	end
+
+	local TweenService = game:GetService("TweenService")
+	local HttpService = game:GetService("HttpService")
+	local RunService = game:GetService("RunService")
+
+	local outQuick = TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+	local out = TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local plugin = script:FindFirstAncestorWhichIsA("Plugin")
+
+	local methods = {}
+	local modules = {}
+
+	_G.UIToolsMain = methods
+
+	repeat task.wait() until _G.UIToolsMain
+
+	local self = script.Parent
+
+	local function Tween(instance, tweenInfo, goal, yield)
+		local tween = TweenService:Create(instance, tweenInfo, goal)
+		tween:Play()
+
+		if yield then
+			tween.Completed:Wait()
+		end
+
+		return tween
+	end
+
+	local function checkProperty(instance, name)
+		local newInstance = instance:Clone()
+		newInstance:ClearAllChildren()
+
+		local success = pcall(function()
+			return newInstance[name]
+		end)
+
+		return success
+	end
+
+	for index, folder in ipairs(self:GetChildren()) do
+		for _, module in ipairs(folder:GetChildren()) do
+			if module.ClassName == "ModuleScript" then
+				modules[module.Name] = module
+			end
+		end
+	end
+
+	function methods:getModule(name)
+		if modules[name] then
+			local success, module = pcall(function()
+				return require(modules[name])
+			end)
+
+			if not success then
+				warn(string.format("UI Tools Framework | Failed to load module \"%s\", some features may be impacted.\n\t%s", name, module))
+			else
+				return module
+			end
+		else
+			warn(string.format("UI Tools Framework | Could not find module \"%s\", some features may be impacted", name))
+		end
+	end
+
+	local mainModule = methods:getModule("Plugin")
+	local setTheme = methods:getModule("Theme")
+	local config = methods:getModule("Settings")()
+	local DataManager = methods:getModule("DataManager")
+	local notify = methods:getModule("Notify")
+	local extensions = methods:getModule("Extensions")
+
+	if not cachedBefore then
+		cachedBefore = true
+
+		-- activate all extensions (only once)
+		for _, name in ipairs(config.ActiveExtensions) do
+			extensions.activate(name)
+		end
+
+		config.AccentId.__changed__(function()
+			button.Icon = config.AccentId:get()
+		end, { Name = "dynamicbutton" })
+	end
+
+	button.Icon = config.AccentId:get()
+
+	setTheme()
+	mainModule:createPluginGui(toolbar, button)
+
+	plugin.Unloading:Connect(function()
+		DataManager.save()
+		_G.UIToolsMain = nil
+	end)
+
+	local outdated = false
+	local mouse = plugin:GetMouse()
+
+	local success, response = pcall(function()
+		return HttpService:GetAsync("https://zilibobi.github.io/plugin-version.txt")
+	end)
+
+	if success then
+		response = response:gsub("\n", "")
+		outdated = response ~= config.PluginVersion
+	end
+
+	repeat task.wait() until mainModule.loaded
+
+	for index, element in ipairs(mainModule._widget.Main.TempBackground:GetDescendants()) do
+		if checkProperty(element, "BackgroundTransparency") then
+			task.spawn(function()
+				Tween(element, out, { BackgroundTransparency = 1 }, true)
+				element:Destroy()
+			end)
+		end
+
+		if checkProperty(element, "ImageTransparency") then
+			task.spawn(function()
+				Tween(element, out, { ImageTransparency = 1 }, true)
+				element:Destroy()
+			end)
+		end
+
+		if checkProperty(element, "TextTransparency") then
+			task.spawn(function()
+				Tween(element, out, { TextTransparency = 1 }, true)
+				element:Destroy()
+			end)
+		end
+	end
+
+	Tween(mainModule._widget.Main.TempBackground, outQuick, { BackgroundTransparency = 1 }, true)
+	config.Locked:set(false)
+
+	if outdated and config.Bools["Check For Updates"] and not RunService:IsRunning() then
+		notify.create("Update " .. response, "Hey! You can update the plugin in <b>Plugins > Manage Plugins</b>.", "Okay")
+	end
+
+	if game:GetService("ServerStorage"):GetAttribute("UIToolsSaves") then
+		notify.create("Important", "Looks like there was saved data in this game. This version of plugin is not compatible with the old data storing methods. Your data will be overwritten.", "Okay")
+		game:GetService("ServerStorage"):SetAttribute("UIToolsSaves", nil)
+	end
+end]]></ProtectedString>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+	</Item>
+	<SharedStrings>
+		<SharedString md5="yuZpQdnvvUBOTYh1jqZ2cA=="></SharedString>
+	</SharedStrings>
+</roblox>
