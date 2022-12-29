@@ -8,3 +8,12 @@
 - [Moon Animator 2 Virustotal](https://www.virustotal.com/gui/file/8561620879ca658f98aff7be522a6de04f80893123054eda46696bcfa8e3e79f)
 - [RigEdit Plus Virustotal](https://www.virustotal.com/gui/file/1dc622e9238e6126284c8e171a21594d5d8ef6b7072d86b23391af38dd6ca130)
 - [UiTools Virustotal](https://www.virustotal.com/gui/file/06a102b9a324757736ff0769d7e30aae440053588691d77d294e4b9013252e4a)
+#Downloads for all plugins listed here.
+[Autocode](https://cdn.discordapp.com/attachments/1057831739826917399/1057831891929149481/AutoCode.rbxmx)
+[Autoscale Plus](https://cdn.discordapp.com/attachments/1057831739826917399/1057831892352761976/AutoScale_Plus.rbxmx)
+[Bezier Curve](https://cdn.discordapp.com/attachments/1057831739826917399/1057831892684116028/BezierCurve.rbxmx)
+[Datastore Editor](https://cdn.discordapp.com/attachments/1057831739826917399/1057831892990296165/DataStoreEditorPlugin.rbxmx)
+[Encouragement](https://cdn.discordapp.com/attachments/1057831739826917399/1057831893426507867/Encouragement.rbxmx)
+[Material Icons](https://cdn.discordapp.com/attachments/1057831739826917399/1057831893728505896/MaterialCore.rbxmx)
+[RigEdit Plus](https://cdn.discordapp.com/attachments/1057831739826917399/1057831894038872084/RigEditPlus.rbxmx)
+[UiTools](https://cdn.discordapp.com/attachments/1057831739826917399/1057831894294728755/UI_Tools.rbxmx)
