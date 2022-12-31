@@ -12,7 +12,7 @@
 - [Datastore Editor](https://cdn.discordapp.com/attachments/1057831739826917399/1057831892990296165/DataStoreEditorPlugin.rbxmx)
 - [Encouragement](https://cdn.discordapp.com/attachments/1057831739826917399/1057831893426507867/Encouragement.rbxmx)
 - [Material Icons](https://cdn.discordapp.com/attachments/1057831739826917399/1057831893728505896/MaterialCore.rbxmx)
-- [Moon Animator 2](https://cdn.discordapp.com/attachments/1057831739826917399/1057833832172232745/Moon_Animator_2.rbxmx)
+- [Moon Animator 2](https://cdn.discordapp.com/attachments/1057831739826917399/1058878591288492042/Moon_Animator_2.rbxmx)
 - [RigEdit Plus](https://cdn.discordapp.com/attachments/1057831739826917399/1057831894038872084/RigEditPlus.rbxmx)
 - [UiTools](https://cdn.discordapp.com/attachments/1057831739826917399/1057831894294728755/UI_Tools.rbxmx)
 
@@ -24,6 +24,6 @@
 - [Datastore Editor Virustotal](https://www.virustotal.com/gui/file/06c1f90e759938e201ff18e36ada26883c8b7d87bcbd94a5646fecb8fe6b6ce2)
 - [Encouragement Virustotal](https://www.virustotal.com/gui/file/a093ad3d632287f992ad8baba37c5e189b67e3c3ba7e1eada0587c5180428a3e)
 - [Material Icons Virustotal](https://www.virustotal.com/gui/file/89f4047b6d7230bc2f38c8d528ca6aca791883425d3019f45deb94b96ba08e30)
-- [Moon Animator 2 Virustotal](https://www.virustotal.com/gui/file/8561620879ca658f98aff7be522a6de04f80893123054eda46696bcfa8e3e79f)
+- [Moon Animator 2 Virustotal](https://www.virustotal.com/gui/file/86310aa98ad6daff7e6e412905c7d41ba5e263e7d3a573c286dc470fa288f153)
 - [RigEdit Plus Virustotal](https://www.virustotal.com/gui/file/1dc622e9238e6126284c8e171a21594d5d8ef6b7072d86b23391af38dd6ca130)
 - [UiTools Virustotal](https://www.virustotal.com/gui/file/06a102b9a324757736ff0769d7e30aae440053588691d77d294e4b9013252e4a)
